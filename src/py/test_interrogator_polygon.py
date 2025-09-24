@@ -15,11 +15,12 @@ class InterrogatorTestCase(unittest.TestCase):
         cls.testlayer   = 'Borough'
         cls.testcolumn1 = 'BORONAME'
         cls.testcolumn2 = 'COUNTY'
-        cls.testcolumn3 = 'Shape_Area'
+        # KISS - iterrogator should know if we are doing area, pointxy, etc
+        cls.testcolumn3 = 'SHAPE_AREA'
 
-        cls.testdossier = os.path.join(os.path.dirname(__file__)
-                                       ,'testdata'
-                                       ,'testdossier')
+        cls.testdossierfile = os.path.join(os.path.dirname(__file__)
+                                          ,'testdata'
+                                          ,'testdossier')
 
         cls.borough = interrogator.csclitem(cls.testgdb
                                            ,cls.testlayer)
@@ -27,35 +28,33 @@ class InterrogatorTestCase(unittest.TestCase):
     def tearDown(self):
 
         try:
-            os.remove(self.testdossier)
+            os.remove(self.testdossierfile)
         except FileNotFoundError:
             pass
 
     def test_agetevidence(self):
 
         self.borough.getevidence(self.testcolumn1
-                                ,self.testdossier)
+                                ,self.testdossierfile)
 
-        self.assertTrue(os.path.isfile(self.testdossier))
+        self.assertTrue(os.path.isfile(self.testdossierfile))
 
     def test_bgetmoreevidence(self):
 
         self.borough.getevidence('{0},{1}'.format(self.testcolumn1
                                                  ,self.testcolumn2)
-                                ,self.testdossier)
+                                ,self.testdossierfile)
+
+        self.assertTrue(os.path.isfile(self.testdossierfile))
 
     def test_caddshape(self):
-
-        # area tells us a lot about shape
-        # todo: will need to deal with precision and units 
 
         self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
                                                      ,self.testcolumn2
                                                      ,self.testcolumn3)
-                                ,self.testdossier)
+                                ,self.testdossierfile)
 
-        self.assertTrue(os.path.isfile(self.testdossier))
-
+        self.assertTrue(os.path.isfile(self.testdossierfile))
 
     def test_dgetdossier(self):
 
@@ -68,9 +67,9 @@ class InterrogatorTestCase(unittest.TestCase):
         self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
                                                      ,self.testcolumn2
                                                      ,self.testcolumn3)
-                                ,self.testdossier)
+                                ,self.testdossierfile)
 
-        self.assertEqual(self.borough.getdossier()
+        self.assertEqual(self.borough.getdossier(self.testdossierfile)
                         ,expecteddossier)
 
 
