@@ -1,25 +1,14 @@
 import arcpy
 
-class csclitem(object):
+class csclfeatureclass(object):
 
     def __init__(self
                 ,gdb
                 ,layer):
 
         # file geodatabase or enterprise geodatabase
-        self.gdb         = gdb
-        self.layer       = layer
-
-        # this is a global env
-        # not sure how i feel about using it
-        arcpy.env.workspace = self.gdb
-        self.desc = arcpy.Describe(self.layer)
-
-        # always include area, length, or xy
-
-
-
-        arcpy.env.workspace = None
+        self.gdb   = gdb
+        self.layer = layer
 
     def getevidence(self
                    ,columns 
@@ -41,10 +30,24 @@ class csclitem(object):
                   ,dossierfile):
         
         # this class is agnostic about the dossier location
-        # we may interrogate multiple times for multiple dossiers
+        # we may interrogate multiple times 
+        # producing multiple dossiers
 
         with open(dossierfile,'r') as f:
             unordereddossier = {line.strip() for line in f}
 
-        # return type is set so we can compare without regard to order
+        # return type is a set containing text
+        # permits comparison without regard to order
+        # dont be scared python uses hash based lookups
+        # several million elements are totally fine
         return unordereddossier
+
+class hostedfeaturelayer(object):
+
+    def __init__(self):
+        pass
+
+class postgistable(object):
+
+    def __init__(self):
+        pass

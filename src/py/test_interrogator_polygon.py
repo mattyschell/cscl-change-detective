@@ -3,7 +3,7 @@ import os
 
 import interrogator
 
-class InterrogatorTestCase(unittest.TestCase):
+class InterrogatorPolyTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -16,14 +16,16 @@ class InterrogatorTestCase(unittest.TestCase):
         cls.testcolumn1 = 'BORONAME'
         cls.testcolumn2 = 'COUNTY'
         # KISS - iterrogator should know if we are doing area, pointxy, etc
-        cls.testcolumn3 = 'SHAPE_AREA'
+        # this could also be SHAPE.AREA
+        # the casing does not seem to matter. not sure what the pattern is, weird
+        cls.testcolumn3 = 'Shape_Area'
 
         cls.testdossierfile = os.path.join(os.path.dirname(__file__)
                                           ,'testdata'
                                           ,'testdossier')
 
-        cls.borough = interrogator.csclitem(cls.testgdb
-                                           ,cls.testlayer)
+        cls.borough = interrogator.csclfeatureclass(cls.testgdb
+                                                   ,cls.testlayer)
 
     def tearDown(self):
 

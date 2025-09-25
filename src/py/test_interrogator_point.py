@@ -3,7 +3,7 @@ import os
 
 import interrogator
 
-class InterrogatorTestCase(unittest.TestCase):
+class InterrogatorPointTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -22,8 +22,8 @@ class InterrogatorTestCase(unittest.TestCase):
                                           ,'testdata'
                                           ,'testdossier')
 
-        cls.milepost = interrogator.csclitem(cls.testgdb
-                                            ,cls.testlayer)
+        cls.milepost = interrogator.csclfeatureclass(cls.testgdb
+                                                    ,cls.testlayer)
 
     def tearDown(self):
 
@@ -60,9 +60,6 @@ class InterrogatorTestCase(unittest.TestCase):
 
         self.assertEqual(self.milepost.getdossier(self.testdossierfile)
                         ,expecteddossier)
-
-
-        
 
 if __name__ == '__main__':
     unittest.main()
