@@ -30,7 +30,8 @@ class InterrogatorPolyTestCase(unittest.TestCase):
     def tearDown(self):
 
         try:
-            os.remove(self.testdossierfile)
+            pass
+            #os.remove(self.testdossierfile)
         except FileNotFoundError:
             pass
 
@@ -73,6 +74,60 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
                         ,expecteddossier)
+
+    def test_erounddossier(self):
+
+        expecteddossier = {"Queens,Queens,4962897934.1"
+                          ,"Manhattan,New York,944328629.7"
+                          ,"Bronx,Bronx,1598501138.4"
+                          ,"Brooklyn,Kings,2697660950.4"
+                          ,"Staten Island,Richmond,2851517715.0"}
+
+        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
+                                                     ,self.testcolumn2
+                                                     ,self.testcolumn3)
+                                ,self.testdossierfile
+                                ,self.testcolumn3)
+
+        self.assertEqual(self.borough.getdossier(self.testdossierfile)
+                        ,expecteddossier)
+
+    def test_froundtensdossier(self):
+
+        expecteddossier = {"Queens,Queens,4962897930"
+                          ,"Manhattan,New York,944328630"
+                          ,"Bronx,Bronx,1598501140"
+                          ,"Brooklyn,Kings,2697660950"
+                          ,"Staten Island,Richmond,2851517710"} # careful refer to initial digits
+
+        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
+                                                     ,self.testcolumn2
+                                                     ,self.testcolumn3)
+                                ,self.testdossierfile
+                                ,self.testcolumn3
+                                ,-1)
+
+        self.assertEqual(self.borough.getdossier(self.testdossierfile)
+                        ,expecteddossier)
+
+    def test_froundwholedossier(self):
+
+        expecteddossier = {"Queens,Queens,4962897934"
+                          ,"Manhattan,New York,944328630"
+                          ,"Bronx,Bronx,1598501138"
+                          ,"Brooklyn,Kings,2697660950"
+                          ,"Staten Island,Richmond,2851517715"}
+
+        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
+                                                     ,self.testcolumn2
+                                                     ,self.testcolumn3)
+                                ,self.testdossierfile
+                                ,self.testcolumn3
+                                ,0)
+
+        self.assertEqual(self.borough.getdossier(self.testdossierfile)
+                        ,expecteddossier)
+
 
 
         

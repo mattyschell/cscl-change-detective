@@ -61,5 +61,38 @@ class InterrogatorPointTestCase(unittest.TestCase):
         self.assertEqual(self.milepost.getdossier(self.testdossierfile)
                         ,expecteddossier)
 
+    def test_drounddossier(self):
+
+        expecteddossier = {"3,(1031671.9, 253286.9)"
+                          ,"4,(1031927.9, 252819.1)"
+                          ,"1,(1037085.7, 262114.2)"
+                          ,"2,(1030095.9, 257745.9)"
+                          ,"5,(1031187.4, 254226.9)"}
+
+        self.milepost.getevidence('{0},{1}'.format(self.testcolumn1
+                                                  ,self.testcolumn2)
+                                ,self.testdossierfile
+                                ,self.testcolumn2)
+
+        self.assertEqual(self.milepost.getdossier(self.testdossierfile)
+                        ,expecteddossier)
+
+    def test_droundtensdossier(self):
+
+        expecteddossier = {"3,(1031670, 253290)"
+                          ,"4,(1031930, 252820)"
+                          ,"1,(1037090, 262110)"
+                          ,"2,(1030100, 257750)"
+                          ,"5,(1031190, 254230)"}
+
+        self.milepost.getevidence('{0},{1}'.format(self.testcolumn1
+                                                  ,self.testcolumn2)
+                                ,self.testdossierfile
+                                ,self.testcolumn2
+                                ,-1)
+
+        self.assertEqual(self.milepost.getdossier(self.testdossierfile)
+                        ,expecteddossier)
+
 if __name__ == '__main__':
     unittest.main()

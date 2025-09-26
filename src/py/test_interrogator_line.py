@@ -62,6 +62,21 @@ class InterrogatorLineTestCase(unittest.TestCase):
         self.assertEqual(self.subway.getdossier(self.testdossierfile)
                         ,expecteddossier)
 
+    def test_drounddossier(self):
+
+        expecteddossier = {"8100837,646.2"
+                          ,"8100834,259.5"
+                          ,"8100835,97.7"
+                          ,"8100838,262.7"
+                          ,"8100836,287.5"}
+
+        self.subway.getevidence('{0},{1}'.format(self.testcolumn1
+                                                ,self.testcolumn2)
+                                ,self.testdossierfile
+                                ,self.testcolumn2)
+
+        self.assertEqual(self.subway.getdossier(self.testdossierfile)
+                        ,expecteddossier)
 
         
 
