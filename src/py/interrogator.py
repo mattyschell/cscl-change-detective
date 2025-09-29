@@ -1,14 +1,54 @@
 import arcpy
 
-class csclfeatureclass(object):
 
-    def __init__(self
-                ,gdb
-                ,layer):
+class suspects:
 
-        # file geodatabase or enterprise geodatabase
-        self.gdb   = gdb
-        self.layer = layer
+    def getevidence(self
+                   ,columns 
+                   ,dossierfile 
+                   ,shapecolumn
+                   ,rounddigits
+                   ,convertfactor=1):
+
+        columnlist = [f.strip() for f in columns.split(",")]
+
+        # we support rounding and converting one column only (for now (forever?))
+        try:
+            shape_index = columnlist.index(shapecolumn)
+        except ValueError:
+            shape_index = None
+        
+        with open(dossierfile, 'w') as f: 
+            with arcpy.da.SearchCursor(self.layer
+                                      ,columnlist) as cursor:
+                for row in cursor:
+
+                    # convert tuple to list
+                    row = list(row)
+
+                    if  shape_index is not None \
+                    and convertfactor != 1:
+                        row = self.convertrow(row
+                                             ,shape_index
+                                             ,convertfactor)
+                    
+                    if shape_index is not None:
+                        row = self.roundrow(row
+                                           ,shape_index
+                                           ,rounddigits)
+
+                    # write the evidence to the dossier
+                    f.write(",".join(str(item) for item in row) + "\n")
+
+    def convertrow(self
+                  ,row
+                  ,rowindex
+                  ,convertfactor):
+
+            if isinstance(row[rowindex], (float, int)):
+                row[rowindex] = row[rowindex] * convertfactor
+            
+            return row
 
     def roundrow(self
                 ,row
@@ -29,7 +69,7 @@ class csclfeatureclass(object):
         
         elif isinstance(row[rowindex], (tuple)): 
 
-            # for points we will often request (x,y) instead of area/length
+            # for points we will typically request (x,y) instead of area/length
             # arcpy search cursor returns these as tuples
 
             if rounddigits > 0:
@@ -38,40 +78,6 @@ class csclfeatureclass(object):
                 row[rowindex] = tuple(int(round(num, rounddigits)) for num in row[rowindex])
 
         return row
-
-    def getevidence(self
-                   ,columns 
-                   ,dossierfile 
-                   ,roundcolumn=None
-                   ,rounddigits=1):
-
-        arcpy.env.workspace = self.gdb
-
-        columnlist = [f.strip() for f in columns.split(",")]
-
-        # we support rounding one column only (for now (forever?))
-        try:
-            round_index = columnlist.index(roundcolumn)
-        except ValueError:
-            round_index = None
-        
-        with open(dossierfile, 'w') as f: 
-            with arcpy.da.SearchCursor(self.layer
-                                      ,columnlist) as cursor:
-                for row in cursor:
-
-                    # convert tuple to list
-                    row = list(row)
-                    
-                    if round_index is not None:
-                        row = self.roundrow(row
-                                           ,round_index
-                                           ,rounddigits)
-
-                    # write the evidence to the dossier
-                    f.write(",".join(str(item) for item in row) + "\n")
-
-        arcpy.env.workspace = None
 
     def getdossier(self
                   ,dossierfile):
@@ -89,10 +95,62 @@ class csclfeatureclass(object):
         # several million elements are fine
         return unordereddossier
 
-class hostedfeaturelayer(object):
 
-    def __init__(self):
-        pass
+class csclfeatureclass(suspects):
+
+    def __init__(self
+                ,gdb
+                ,layer):
+
+        # file geodatabase or enterprise geodatabase
+        self.gdb   = gdb
+        self.layer = layer
+
+    def getevidence(self
+                   ,columns 
+                   ,dossierfile 
+                   ,roundcolumn=None
+                   ,rounddigits=1):
+
+        arcpy.env.workspace = self.gdb
+
+        super().getevidence(columns 
+                           ,dossierfile 
+                           ,roundcolumn
+                           ,rounddigits)
+
+        arcpy.env.workspace = None
+    
+
+class hostedfeaturelayer(suspects):
+
+    def __init__(self
+                ,url
+                ,layer):
+
+        # layer name is determined by caller not by agol
+        # use it to instantiate a unique name in 
+        # our current arcpy session
+
+        self.url   = url   
+        self.layer = layer
+
+        arcpy.MakeFeatureLayer_management(self.url
+                                         ,self.layer)   
+
+    def getevidence(self
+                   ,columns 
+                   ,dossierfile 
+                   ,roundcolumn=None
+                   ,rounddigits=1
+                   ,convertfactor=1):     
+
+        super().getevidence(columns 
+                           ,dossierfile 
+                           ,roundcolumn
+                           ,rounddigits
+                           ,convertfactor)
+
 
 class postgistable(object):
 

@@ -8,24 +8,20 @@ class InterrogatorPolyTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
 
-        cls.testgdb = os.path.join(os.path.dirname(__file__)
-                                   ,'testdata'
-                                   ,'test.gdb')
-
+        cls.testurl = 'https://services6.arcgis.com/yG5s3afENB5iO9fj/arcgis/rest/services/Borough_view/FeatureServer/0'
+        
         cls.testlayer   = 'Borough'
         cls.testcolumn1 = 'BORONAME'
         cls.testcolumn2 = 'COUNTY'
-        # KISS - iterrogator should know if we are doing area, pointxy, etc
-        # this could also be SHAPE.AREA
-        # the casing does not seem to matter. not sure what the pattern is, weird
-        cls.testcolumn3 = 'Shape_Area'
+        # hosted feature layers add an underscore to avoid conflicts with storage layers
+        cls.testcolumn3 = 'SHAPE__Area'
 
         cls.testdossierfile = os.path.join(os.path.dirname(__file__)
                                           ,'testdata'
                                           ,'testdossier')
 
-        cls.borough = interrogator.csclfeatureclass(cls.testgdb
-                                                   ,cls.testlayer)
+        cls.borough = interrogator.hostedfeaturelayer(cls.testurl
+                                                     ,cls.testlayer)
 
     def tearDown(self):
 
@@ -48,7 +44,7 @@ class InterrogatorPolyTestCase(unittest.TestCase):
                                 ,self.testdossierfile)
 
         self.assertTrue(os.path.isfile(self.testdossierfile))
-
+        
     def test_caddshape(self):
 
         self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
@@ -60,12 +56,12 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
     def test_dgetdossier(self):
 
-        expecteddossier = {"Queens,Queens,4962897934.05186"
-                          ,"Manhattan,New York,944328629.691523"
-                          ,"Bronx,Bronx,1598501138.43022"
-                          ,"Brooklyn,Kings,2697660950.436"
-                          ,"Staten Island,Richmond,2851517714.98682"}
-                          
+        # area in square meters
+        expecteddossier = {"Staten Island,Richmond,459489372.20703125"
+                          ,"Bronx,Bronx,259796496.62890625"
+                          ,"Queens,Queens,801990330.7890625"
+                          ,"Brooklyn,Kings,435630776.72265625"
+                          ,"Manhattan,New York,153133552.01171875"}           
 
         self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
                                                      ,self.testcolumn2
@@ -75,48 +71,13 @@ class InterrogatorPolyTestCase(unittest.TestCase):
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
                         ,expecteddossier)
 
-    def test_erounddossier(self):
-
-        expecteddossier = {"Queens,Queens,4962897934.1"
-                          ,"Manhattan,New York,944328629.7"
-                          ,"Bronx,Bronx,1598501138.4"
-                          ,"Brooklyn,Kings,2697660950.4"
-                          ,"Staten Island,Richmond,2851517715.0"}
-
-        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
-                                                     ,self.testcolumn2
-                                                     ,self.testcolumn3)
-                                ,self.testdossierfile
-                                ,self.testcolumn3)
-
-        self.assertEqual(self.borough.getdossier(self.testdossierfile)
-                        ,expecteddossier)
-
-    def test_froundtensdossier(self):
-                                          
-        expecteddossier = {"Queens,Queens,4962897930"
-                          ,"Manhattan,New York,944328630"
-                          ,"Bronx,Bronx,1598501140"
-                          ,"Brooklyn,Kings,2697660950"
-                          ,"Staten Island,Richmond,2851517710"} 
-
-        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
-                                                     ,self.testcolumn2
-                                                     ,self.testcolumn3)
-                                ,self.testdossierfile
-                                ,self.testcolumn3
-                                ,-1)
-
-        self.assertEqual(self.borough.getdossier(self.testdossierfile)
-                        ,expecteddossier)
-
-    def test_froundwholedossier(self):
-
-        expecteddossier = {"Queens,Queens,4962897934"
-                          ,"Manhattan,New York,944328630"
-                          ,"Bronx,Bronx,1598501138"
-                          ,"Brooklyn,Kings,2697660950"
-                          ,"Staten Island,Richmond,2851517715"}
+    def test_drounddossier(self):
+                    
+        expecteddossier = {"Staten Island,Richmond,459489372"
+                          ,"Bronx,Bronx,259796497"
+                          ,"Queens,Queens,801990331"
+                          ,"Brooklyn,Kings,435630777"
+                          ,"Manhattan,New York,153133552"}           
 
         self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
                                                      ,self.testcolumn2
@@ -128,9 +89,47 @@ class InterrogatorPolyTestCase(unittest.TestCase):
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
                         ,expecteddossier)
 
+    def test_eroundsquarefeetdossier(self):
 
+        # AGOL output converted with a calculator
+        expecteddossier = {"Queens,Queens,8632552062"
+                          ,"Manhattan,New York,1648315833"
+                          ,"Bronx,Bronx,2796426212"
+                          ,"Brooklyn,Kings,4689090648"
+                          ,"Staten Island,Richmond,4945902432"}
+                                                   
+        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
+                                                     ,self.testcolumn2
+                                                     ,self.testcolumn3)
+                                ,self.testdossierfile
+                                ,self.testcolumn3
+                                ,0
+                                ,10.7639104)
 
-        
+        self.assertEqual(self.borough.getdossier(self.testdossierfile)
+                        ,expecteddossier)
+
+#    def test_fmatchcscldossier(self):
+#
+#        # converting square meters to square feet should match
+#        # the file geodatabase in this repo (with sufficient rounding)
+#        expecteddossier = {"Queens,Queens,4962897934"
+#                          ,"Manhattan,New York,944328630"
+#                          ,"Bronx,Bronx,1598501138"
+#                          ,"Brooklyn,Kings,2697660950"
+#                          ,"Staten Island,Richmond,2851517715"}
+#                                                   
+#        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
+#                                                     ,self.testcolumn2
+#                                                     ,self.testcolumn3)
+#                                ,self.testdossierfile
+#                                ,self.testcolumn3
+#                                ,0
+#                                ,10.7639104)
+#
+#        self.assertEqual(self.borough.getdossier(self.testdossierfile)
+#                        ,expecteddossier)
+
 
 if __name__ == '__main__':
     unittest.main()
