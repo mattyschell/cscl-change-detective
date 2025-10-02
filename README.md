@@ -4,6 +4,9 @@ We will compare CSCL data to upstream or downstream sources. When one source cha
 
 ![whereintheworld](./adventure.png)
 
+## Compare a CSCL Feature Layer to an AGOL Hosted Feature Layer
+
+DOC tbd
 
 ## Tests
 
