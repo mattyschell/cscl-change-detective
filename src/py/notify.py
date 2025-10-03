@@ -26,22 +26,24 @@ def main():
 
     pnotification   = sys.argv[1]
     pemails         = sys.argv[2]
-    plogtype        = sys.argv[3] # ex 'HistoricDistrict' 
+    plogtype        = sys.argv[3] # ex 'HistoricDistrict' 'NOLOG'
     plogdir         = sys.argv[4]
     pemailfrom      = sys.argv[5]
     psmtpfrom       = sys.argv[6]
     
     msg = EmailMessage()
 
-    # notification is like "very important thing"
+    # notification is like "a very important thing"
 
     content  = 'Completed {0} '.format(pnotification)
     msg['Subject'] = content
     content += 'at {0} {1}'.format(datetime.datetime.now()
                                   ,os.linesep)
 
-    content += '\n' + getlogfile(plogdir
-                                ,plogtype)   
+    # NOLOG input on failures 
+    if plogtype != 'NOLOG':
+        content += '\n' + getlogfile(plogdir
+                                    ,plogtype)   
     
     smtp = smtplib.SMTP(psmtpfrom)  
     msg['From'] = pemailfrom

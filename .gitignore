@@ -3,3 +3,5 @@ scratch/
 *local.bat
 *.lock
 *.log
+evidenceroom/*
+!evidenceroom/**/.gitkeep
