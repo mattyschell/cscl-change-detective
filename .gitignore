@@ -5,3 +5,4 @@ scratch/
 *.log
 evidenceroom/*
 !evidenceroom/**/.gitkeep
+geodatabase-scripts/historicdistrict*

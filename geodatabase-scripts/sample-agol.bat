@@ -12,8 +12,11 @@ set LOGDIR=%BASEPATH%\cscl-change-detective\geodatabase-scripts\logs\%ENV%
 set NOTIFY=xxx@xxx.xxx.xxx
 set NOTIFYFROM=xxx@xxx.xxx.xx
 set SMTPFROM=xxxx.xxxx
-REM set PROPY=c:\Progra~1\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe
-set PROPY=C:\Users\%USERNAME%\AppData\Local\Programs\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe
+if exist "%PYTHON1%" (
+    set PROPY=%PYTHON1%
+) else if exist "%PYTHON2%" (
+    set PROPY=%PYTHON2%
+) 
 set BATLOG=%LOGDIR%\%ENV%-%CSCLLAYERNAME%.log
 echo investigating %ENV% %CSCLLAYER% on %date% at %time% > %BATLOG%
 CALL %PROPY% %BASEPATH%\cscl-change-detective\src\py\investigate.py %CSCLGDB% %CSCLLAYER% %CSCLLAYERCOLS% %EXTERNALLAYER% %EXTERNALLAYERCOLS% %EVIDENCEROOM% %LOGDIR%
