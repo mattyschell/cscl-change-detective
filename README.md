@@ -40,15 +40,9 @@ The output of the investigation will be raw dossiers named like "featureclass" a
 
 ## Tests
 
-ArcGIS Online tests.
+ArcGIS Online and PostGIS tests. Update the environmental with your local PostgreSQL superuser for testing.
 
 ```bat
+> set PGPASSWORD=xxxxx
 > geodatabase-scripts\testall.bat
-```
-
-PostGIS tests.  Update the environmental with your local PostgreSQL superuser for testing.
-
-```sh
-$ export PGPASSWORD=xxxxxxxx
-$ ./geodatabase-scripts/testall.sh
 ```
