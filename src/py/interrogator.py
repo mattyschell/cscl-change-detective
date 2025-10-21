@@ -1,5 +1,6 @@
 import arcpy
 import os
+import subprocess
 
 
 class suspects:
@@ -121,8 +122,8 @@ class csclfeatureclass(suspects):
                 ,layer):
 
         # file geodatabase or enterprise geodatabase
-        self.gdb   = gdb
-        self.layer = layer
+        self.gdb    = gdb
+        self.layer  = layer
 
     def getevidence(self
                    ,columns 
@@ -150,8 +151,8 @@ class hostedfeaturelayer(suspects):
         # use it to instantiate a unique name in 
         # our current arcpy session
 
-        self.url   = url   
-        self.layer = layer
+        self.url    = url   
+        self.layer  = layer
 
         arcpy.MakeFeatureLayer_management(self.url
                                          ,self.layer)   
@@ -170,7 +171,7 @@ class hostedfeaturelayer(suspects):
                            ,convertfactor)
 
 
-class postgistable(object):
+class postgistable(suspects):
 
     def __init__(self
                 ,database
@@ -179,7 +180,7 @@ class postgistable(object):
         self.pgdatabase = database
         self.table      = table
         self.pghost     = os.getenv('PGHOST', 'localhost')
-        self.pgport     = os.getenv('PGPORT', 5432)
+        self.pgport     = os.getenv('PGPORT', 5432)    
 
     def getevidence(self
                    ,columns
@@ -189,16 +190,14 @@ class postgistable(object):
                    ,convertfactor=1):
 
         columnlist, shape_index = super().getcolumninfo(columns
-                                                       ,shapecolumn)
+                                                       ,roundcolumn)
 
         with open(dossierfile, 'w') as f: 
 
+            # list of lists
             rows = self.getrows(columns)
 
             for row in rows:
-
-                # convert tuple to list
-                row = list(row)
 
                 if  shape_index is not None \
                 and convertfactor != 1:
@@ -208,8 +207,8 @@ class postgistable(object):
                 
                 if shape_index is not None:
                     row = super().roundrow(row
-                                            ,shape_index
-                                            ,rounddigits)
+                                          ,shape_index
+                                          ,rounddigits)
 
                 # write the evidence to the dossier
                 f.write(",".join(str(item) for item in row) + "\n")
@@ -219,24 +218,42 @@ class postgistable(object):
 
         # this is the postgis class equivalent of 
         # arcpy.da.SearchCursor in the esri classes
-
+        
         sql = "select {0} from {1}".format(columns
                                           ,self.table)
 
         # tuples only, ignore user startup file, unaligned output   
-        # conninfo string is all environmentals   
-        psqlcmd =  'psql -d {0} -tXA -c {0} '.format(self.pgdatabase
-                                                    ,sql)
-        #print(psqlcmd)
+        # except for database, connection is externalized   
+        psqlcmd =  'psql -d {0} -tXA -c "{1}" '.format(self.pgdatabase
+                                                      ,sql)
         
-        p1 = subprocess.Popen(psqlcmd
-                             ,stdout=subprocess.PIPE
-                             ,shell=True)
+        try:
+            p1 = subprocess.Popen(psqlcmd
+                                 ,stdout=subprocess.PIPE
+                                 ,stderr=subprocess.PIPE
+                                 ,shell=True
+                                 ,text=True) #return strings not bytes
 
-        output = p1.communicate()[0]
+            # outputstr is a big chunk of text
+            outputstr, error = p1.communicate()
 
-        # \l for UTF8 reminder friend
-        # in python3 we must decode or we get b'asciibytedata'
-        return output.strip().decode('utf-8')     
+            if p1.returncode != 0:
+                raise ValueError(
+                    """psql call to database {0} failed using {1}.
+                       Returncode is {2} error is {3}""".format(self.pgdatabase
+                                                               ,psqlcmd
+                                                               ,p1.returncode
+                                                               ,error))
+        except Exception as e:
+            raise ValueError(
+                    """Exception occurred while running command {0}. 
+                       Exception: {1}""".format(psqlcmd
+                                               ,str(e)))
+
+        # convert to a list with one row per element
+        rows = [line.split(',') for line in outputstr.strip().splitlines()]
+        return rows
+
+
         
 

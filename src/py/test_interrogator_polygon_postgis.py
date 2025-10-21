@@ -1,6 +1,7 @@
 import unittest
 import os
 import subprocess
+import time
 
 import interrogator
 
@@ -9,12 +10,12 @@ class InterrogatorPolyTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
 
+
         cls.testdatabase = 'csclchangedetective'
-        cls.testlayer   = 'Borough'
-        cls.testcolumn1 = 'BORONAME'
-        cls.testcolumn2 = 'COUNTY'
-        # hosted feature layers add an underscore to avoid conflicts with storage layers
-        cls.testcolumn3 = 'SHAPE__Area'
+        cls.testlayer   = 'borough'
+        cls.testcolumn1 = 'boroname'
+        cls.testcolumn2 = 'county'
+        cls.testcolumn3 = 'shape_area'
 
         cls.testdossierfile = os.path.join(os.path.dirname(__file__)
                                           ,'testdata'
@@ -29,18 +30,24 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
         os.environ["PGDATABASE"] = 'postgres'
         os.environ["PGUSER"] = 'postgres'
-
         subprocess.run(["psql", "-f", cls.schemasql], check=True)
 
         os.environ["PGDATABASE"] = cls.testdatabase
         subprocess.run(["psql", "-f", cls.datasql], check=True)
 
+        # not real only exist temporarily for scratch setup and teardown
+        cls.superpw = os.environ["PGPASSWORD"]
+        os.environ["PGUSER"] = 'carmensandiego'
+        os.environ["PGPASSWORD"] = 'appleII3'
+
     @classmethod
     def tearDownClass(cls):
 
+        os.environ["PGPASSWORD"] = cls.superpw
         os.environ["PGDATABASE"] = 'postgres'
+        os.environ['PGUSER']     = 'postgres'
         subprocess.run(["psql", "-f", cls.teardownsql], check=True)       
-
+        
     def tearDown(self):
 
         try:
@@ -48,15 +55,12 @@ class InterrogatorPolyTestCase(unittest.TestCase):
         except FileNotFoundError:
             pass
 
-
-
     def test_agetevidence(self):
+        
+        self.borough.getevidence(self.testcolumn1
+                                ,self.testdossierfile)
 
-        pass
-        #self.borough.getevidence(self.testcolumn1
-        #                        ,self.testdossierfile)
-
-        #self.assertTrue(os.path.isfile(self.testdossierfile))
+        self.assertTrue(os.path.isfile(self.testdossierfile))
 
     
 

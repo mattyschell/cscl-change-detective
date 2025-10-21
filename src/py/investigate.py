@@ -39,7 +39,11 @@ def main():
     targetlog = os.path.join(plogdir 
                             ,'investigate-{0}-{1}.log'.format(gdblayername
                                                              ,timestr))
-
+    # TODO switch this to 
+    # logger = logging.getLogger(targetlog)
+    # logging is the base logger
+    # then pass in to interrogator if possible
+    
     logging.basicConfig(
         level=logging.INFO,                     
         format='%(asctime)s - %(levelname)s - %(message)s', 
