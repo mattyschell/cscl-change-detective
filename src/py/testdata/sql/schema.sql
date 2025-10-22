@@ -1,3 +1,5 @@
+\set QUIET 1
+SET client_min_messages TO WARNING;
 create database csclchangedetective;  
 -- this is not a real user
 -- this is not a real password

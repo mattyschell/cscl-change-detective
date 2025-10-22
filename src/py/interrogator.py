@@ -68,33 +68,45 @@ class suspects:
         
         return row
 
+    def isfloatable(self
+                  ,input):
+        try:
+            float(input)
+            return True 
+        except ValueError:
+            return False
+
     def roundrow(self
                 ,row
                 ,rowindex
                 ,rounddigits):
 
         # fish out the rounding column position and round if its a number
+        # reminder: round now as number
+        #           later write to dossier. dossier is a set of text
 
-        if isinstance(row[rowindex], (float, int)):    
-                        
-            if rounddigits > 0:
-                row[rowindex] = round(row[rowindex], rounddigits)
-            else:
-                # rounding floats produces floats like 
-                # round(123.123,-1) = 120.0 
-                # so int() to produce the more expected 120
-                row[rowindex] = int(round(row[rowindex], rounddigits))
-        
-        elif isinstance(row[rowindex], (tuple)): 
+        if isinstance(row[rowindex], (tuple)): 
 
             # for points we will typically request (x,y) instead of area/length
             # arcpy search cursor returns these as tuples
-            # todo: gotta think about PostGIS here
+            # goes first, dont let it fall into the next elif
+            # ToDo gotta think about PostGIS here
 
             if rounddigits > 0:
                 row[rowindex] = tuple(round(num, rounddigits) for num in row[rowindex])
             else:
                 row[rowindex] = tuple(int(round(num, rounddigits)) for num in row[rowindex])
+
+        elif isinstance(row[rowindex], (float, int)) \
+        or  (isinstance(row[rowindex], (str)) and self.isfloatable(row[rowindex])):    
+                        
+            if rounddigits > 0:
+                row[rowindex] = round(float(row[rowindex]), rounddigits)
+            else:
+                # rounding floats produces floats like 
+                # round(123.123,-1) = 120.0 
+                # so int() to produce the more expected 120
+                row[rowindex] = int(round(float(row[rowindex]), rounddigits))
 
         return row
 
@@ -224,8 +236,9 @@ class postgistable(suspects):
 
         # tuples only, ignore user startup file, unaligned output   
         # except for database, connection is externalized   
-        psqlcmd =  'psql -d {0} -tXA -c "{1}" '.format(self.pgdatabase
-                                                      ,sql)
+        psqlcmd =  'psql -d {0} -F {1} -tXA -c "{2}" '.format(self.pgdatabase
+                                                             ,','
+                                                             ,sql)
         
         try:
             p1 = subprocess.Popen(psqlcmd
@@ -239,19 +252,22 @@ class postgistable(suspects):
 
             if p1.returncode != 0:
                 raise ValueError(
-                    """psql call to database {0} failed using {1}.
-                       Returncode is {2} error is {3}""".format(self.pgdatabase
-                                                               ,psqlcmd
-                                                               ,p1.returncode
-                                                               ,error))
+                    "psql call to database {0} failed using {1}.\n"
+                    "Returncode is {2} error is {3}".format(self.pgdatabase
+                                                           ,psqlcmd
+                                                           ,p1.returncode
+                                                           ,error))
         except Exception as e:
             raise ValueError(
-                    """Exception occurred while running command {0}. 
-                       Exception: {1}""".format(psqlcmd
-                                               ,str(e)))
+                    "Exception occurred while running command {0}.\n" 
+                    "Exception: {1}".format(psqlcmd
+                                           ,str(e)))
 
         # convert to a list with one row per element
         rows = [line.split(',') for line in outputstr.strip().splitlines()]
+
+        # [['Queens', '4'], ['Manhattan', '5']]
+        # the comment commas are SOP python pretty-print, not real
         return rows
 
 

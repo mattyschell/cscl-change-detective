@@ -110,7 +110,7 @@ class InterrogatorPolyTestCase(unittest.TestCase):
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
                         ,expecteddossier)
 
-    def test_froundwholedossier(self):
+    def test_groundwholedossier(self):
 
         expecteddossier = {"Queens,Queens,4962897934"
                           ,"Manhattan,New York,944328630"

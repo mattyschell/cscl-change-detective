@@ -62,7 +62,97 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
         self.assertTrue(os.path.isfile(self.testdossierfile))
 
+    def test_bfailtogetevidence(self):
+        
+        with self.assertRaises(ValueError):
+            self.borough.getevidence('SpreadLoveItsTheBrooklynWay'
+                                    ,self.testdossierfile)
+
+    def test_cgetmoreevidence(self):
+
+        self.borough.getevidence('{0},{1}'.format(self.testcolumn1
+                                                 ,self.testcolumn2)
+                                ,self.testdossierfile)
+
+        self.assertTrue(os.path.isfile(self.testdossierfile))
+
+    def test_daddshape(self):
+
+        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
+                                                     ,self.testcolumn2
+                                                     ,self.testcolumn3)
+                                ,self.testdossierfile)
+
+        self.assertTrue(os.path.isfile(self.testdossierfile))
     
+    def test_egetdossier(self):
+
+        expecteddossier = {"Queens,Queens,4962897934.05"
+                          ,"Manhattan,New York,944328629.692"
+                          ,"Bronx,Bronx,1598501138.43"
+                          ,"Brooklyn,Kings,2697660950.44"
+                          ,"Staten Island,Richmond,2851517714.99"}
+                          
+        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
+                                                     ,self.testcolumn2
+                                                     ,self.testcolumn3)
+                                ,self.testdossierfile)
+
+        self.assertEqual(self.borough.getdossier(self.testdossierfile)
+                        ,expecteddossier)
+
+    def test_frounddossier(self):
+
+        expecteddossier = {"Queens,Queens,4962897934.1"
+                          ,"Manhattan,New York,944328629.7"
+                          ,"Bronx,Bronx,1598501138.4"
+                          ,"Brooklyn,Kings,2697660950.4"
+                          ,"Staten Island,Richmond,2851517715.0"}
+
+        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
+                                                     ,self.testcolumn2
+                                                     ,self.testcolumn3)
+                                ,self.testdossierfile
+                                ,self.testcolumn3)
+
+        self.assertEqual(self.borough.getdossier(self.testdossierfile)
+                        ,expecteddossier)
+
+    def test_groundtensdossier(self):
+                                          
+        expecteddossier = {"Queens,Queens,4962897930"
+                          ,"Manhattan,New York,944328630"
+                          ,"Bronx,Bronx,1598501140"
+                          ,"Brooklyn,Kings,2697660950"
+                          ,"Staten Island,Richmond,2851517710"} 
+
+        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
+                                                     ,self.testcolumn2
+                                                     ,self.testcolumn3)
+                                ,self.testdossierfile
+                                ,self.testcolumn3
+                                ,-1)
+
+        self.assertEqual(self.borough.getdossier(self.testdossierfile)
+                        ,expecteddossier)
+
+    def test_hroundwholedossier(self):
+
+        expecteddossier = {"Queens,Queens,4962897934"
+                          ,"Manhattan,New York,944328630"
+                          ,"Bronx,Bronx,1598501138"
+                          ,"Brooklyn,Kings,2697660950"
+                          ,"Staten Island,Richmond,2851517715"}
+
+        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
+                                                     ,self.testcolumn2
+                                                     ,self.testcolumn3)
+                                ,self.testdossierfile
+                                ,self.testcolumn3
+                                ,0)
+
+        self.assertEqual(self.borough.getdossier(self.testdossierfile)
+                        ,expecteddossier)
 
 if __name__ == '__main__':
     unittest.main()
