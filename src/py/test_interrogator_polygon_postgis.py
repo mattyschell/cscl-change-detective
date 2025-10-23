@@ -1,7 +1,6 @@
 import unittest
 import os
 import subprocess
-import time
 
 import interrogator
 
@@ -9,7 +8,6 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-
 
         cls.testdatabase = 'csclchangedetective'
         cls.testlayer   = 'borough'

@@ -13,4 +13,4 @@ set PGUSER=postgres
 set PGDATABASE=postgres
 set PGHOST=localhost
 call %PROPY% .\src\py\test_interrogator_polygon_postgis.py
-REM call %PROPY% .\src\py\test_interrogator_point_postgis.py
+call %PROPY% .\src\py\test_interrogator_point_postgis.py

@@ -1,6 +1,7 @@
 import arcpy
 import os
 import subprocess
+import re
 
 
 class suspects:
@@ -141,7 +142,8 @@ class csclfeatureclass(suspects):
                    ,columns 
                    ,dossierfile 
                    ,roundcolumn=None
-                   ,rounddigits=1):
+                   ,rounddigits=1
+                   ,convertfactor=1):
 
         arcpy.env.workspace = self.gdb
 
@@ -268,7 +270,30 @@ class postgistable(suspects):
 
         # [['Queens', '4'], ['Manhattan', '5']]
         # the comment commas are SOP python pretty-print, not real
-        return rows
+
+        return self.tuplepoints(rows)
+
+    def tuplepoints(self
+                   ,listofrows):
+
+        # esri @SHAPEXY   returns tuple (1.23 4.56)
+        # st_astext(geom) returns POINT(1.23, 4.56)
+
+        pattern = r'^POINT\((-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\)$'
+
+        for i in range(len(listofrows)):
+
+            for j in range(len(listofrows[i])):
+
+                match = re.match(pattern, listofrows[i][j])
+
+                if match:
+                    x,y = match.groups()
+                    listofrows[i][j] = (float(x), float(y))
+
+        return listofrows
+
+
 
 
         
