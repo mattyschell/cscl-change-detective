@@ -9,12 +9,37 @@ class suspects:
     def getevidence(self
                    ,columns 
                    ,dossierfile 
-                   ,shapecolumn
-                   ,rounddigits
+                   ,shapecolumn=None
+                   ,rounddigits=1
                    ,convertfactor=1):
 
-        columnlist, shape_index = self.getcolumninfo(columns
-                                                    ,shapecolumn)
+        raise NotImplementedError("Subclasses implement this method")
+
+    def getdossier(self
+                  ,dossierfile):
+        
+        # this class is agnostic about the dossier location
+        # we may interrogate multiple times 
+        # producing multiple dossiers
+
+        with open(dossierfile,'r') as f:
+            unordereddossier = {line.strip() for line in f}
+
+        # return type is a set containing text
+        # permits comparison without regard to order
+        # python uses hash based lookups
+        # several million elements are fine
+        return unordereddossier
+
+    def _getesrievidence(self
+                        ,columns 
+                        ,dossierfile 
+                        ,shapecolumn=None
+                        ,rounddigits=1
+                        ,convertfactor=1):
+
+        columnlist, shape_index = self._getcolumninfo(columns
+                                                     ,shapecolumn)
         
         with open(dossierfile, 'w') as f: 
             with arcpy.da.SearchCursor(self.layer
@@ -26,21 +51,21 @@ class suspects:
 
                     if  shape_index is not None \
                     and convertfactor != 1:
-                        row = self.convertrow(row
-                                             ,shape_index
-                                             ,convertfactor)
+                        row = self._convertrow(row
+                                              ,shape_index
+                                              ,convertfactor)
                     
                     if shape_index is not None:
-                        row = self.roundrow(row
-                                           ,shape_index
-                                           ,rounddigits)
+                        row = self._roundrow(row
+                                            ,shape_index
+                                            ,rounddigits)
 
                     # write the evidence to the dossier
                     f.write(",".join(str(item) for item in row) + "\n")
 
-    def getcolumninfo(self
-                     ,columns
-                     ,shapecolumn):
+    def _getcolumninfo(self
+                      ,columns
+                      ,shapecolumn):
 
         # convert comma-delimited columns to list
         # get shape index of the list if it exists
@@ -56,31 +81,32 @@ class suspects:
 
         return columnlist, shape_index
 
-    def convertrow(self
-                  ,row
-                  ,rowindex
-                  ,convertfactor):
+    def _convertrow(self
+                   ,row
+                   ,rowindex
+                   ,convertfactor):
 
         # convert sq m to sq feet for example
         # that type of conversion
+        # TODO: any tests for this?
 
         if isinstance(row[rowindex], (float, int)):
             row[rowindex] = row[rowindex] * convertfactor
         
         return row
 
-    def isfloatable(self
-                  ,input):
+    def _isfloatable(self
+                   ,input):
         try:
             float(input)
             return True 
         except ValueError:
             return False
 
-    def roundrow(self
-                ,row
-                ,rowindex
-                ,rounddigits):
+    def _roundrow(self
+                 ,row
+                 ,rowindex
+                 ,rounddigits):
 
         # fish out the rounding column position and round if its a number
         # reminder: round now as number
@@ -99,7 +125,7 @@ class suspects:
                 row[rowindex] = tuple(int(round(num, rounddigits)) for num in row[rowindex])
 
         elif isinstance(row[rowindex], (float, int)) \
-        or  (isinstance(row[rowindex], (str)) and self.isfloatable(row[rowindex])):    
+        or  (isinstance(row[rowindex], (str)) and self._isfloatable(row[rowindex])):    
                         
             if rounddigits > 0:
                 row[rowindex] = round(float(row[rowindex]), rounddigits)
@@ -110,22 +136,6 @@ class suspects:
                 row[rowindex] = int(round(float(row[rowindex]), rounddigits))
 
         return row
-
-    def getdossier(self
-                  ,dossierfile):
-        
-        # this class is agnostic about the dossier location
-        # we may interrogate multiple times 
-        # producing multiple dossiers
-
-        with open(dossierfile,'r') as f:
-            unordereddossier = {line.strip() for line in f}
-
-        # return type is a set containing text
-        # permits comparison without regard to order
-        # dont be scared python uses hash based lookups
-        # several million elements are fine
-        return unordereddossier
 
 
 class csclfeatureclass(suspects):
@@ -141,16 +151,17 @@ class csclfeatureclass(suspects):
     def getevidence(self
                    ,columns 
                    ,dossierfile 
-                   ,roundcolumn=None
+                   ,shapecolumn=None
                    ,rounddigits=1
                    ,convertfactor=1):
 
         arcpy.env.workspace = self.gdb
 
-        super().getevidence(columns 
-                           ,dossierfile 
-                           ,roundcolumn
-                           ,rounddigits)
+        super()._getesrievidence(columns 
+                                ,dossierfile 
+                                ,shapecolumn
+                                ,rounddigits
+                                ,convertfactor)
 
         arcpy.env.workspace = None
     
@@ -174,15 +185,15 @@ class hostedfeaturelayer(suspects):
     def getevidence(self
                    ,columns 
                    ,dossierfile 
-                   ,roundcolumn=None
+                   ,shapecolumn=None
                    ,rounddigits=1
                    ,convertfactor=1):     
 
-        super().getevidence(columns 
-                           ,dossierfile 
-                           ,roundcolumn
-                           ,rounddigits
-                           ,convertfactor)
+        super()._getesrievidence(columns 
+                                ,dossierfile 
+                                ,shapecolumn
+                                ,rounddigits
+                                ,convertfactor)
 
 
 class postgistable(suspects):
@@ -199,36 +210,36 @@ class postgistable(suspects):
     def getevidence(self
                    ,columns
                    ,dossierfile
-                   ,roundcolumn=None
+                   ,shapecolumn=None
                    ,rounddigits=1
                    ,convertfactor=1):
 
-        columnlist, shape_index = super().getcolumninfo(columns
-                                                       ,roundcolumn)
+        columnlist, shape_index = super()._getcolumninfo(columns
+                                                        ,shapecolumn)
 
         with open(dossierfile, 'w') as f: 
 
             # list of lists
-            rows = self.getrows(columns)
+            rows = self._getrows(columns)
 
             for row in rows:
 
                 if  shape_index is not None \
                 and convertfactor != 1:
-                    row = super().convertrow(row
-                                            ,shape_index
-                                            ,convertfactor)
+                    row = super()._convertrow(row
+                                             ,shape_index
+                                             ,convertfactor)
                 
                 if shape_index is not None:
-                    row = super().roundrow(row
-                                          ,shape_index
-                                          ,rounddigits)
+                    row = super()._roundrow(row
+                                           ,shape_index
+                                           ,rounddigits)
 
                 # write the evidence to the dossier
                 f.write(",".join(str(item) for item in row) + "\n")
 
-    def getrows(self
-               ,columns):
+    def _getrows(self
+                ,columns):
 
         # this is the postgis class equivalent of 
         # arcpy.da.SearchCursor in the esri classes
@@ -271,11 +282,12 @@ class postgistable(suspects):
         # [['Queens', '4'], ['Manhattan', '5']]
         # the comment commas are SOP python pretty-print, not real
 
-        return self.tuplepoints(rows)
+        return self._tuplepoints(rows)
 
-    def tuplepoints(self
-                   ,listofrows):
+    def _tuplepoints(self
+                    ,listofrows):
 
+        # we use x,y for points in lieu of shape_area or shape_length
         # esri @SHAPEXY   returns tuple (1.23 4.56)
         # st_astext(geom) returns POINT(1.23, 4.56)
 
