@@ -113,10 +113,10 @@ class InterrogatorPolyTestCase(unittest.TestCase):
                         ,expecteddossier)
 
 #    def test_fmatchcscldossier(self):
-#
 #        # converting square meters to square feet should match
 #        # the file geodatabase in this repo (with sufficient rounding)
-#        # something is weird with the AGOL Shape__Area values
+#        # owever AGOL Shape__Area values are being calculated in loust web mercator
+#        # for now we have no solution
 #        expecteddossier = {"Queens,Queens,4962900000"
 #                          ,"Manhattan,New York,944330000"
 #                          ,"Bronx,Bronx,1598500000"
@@ -134,6 +134,47 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 #        self.assertEqual(self.borough.getdossier(self.testdossierfile)
 #                        ,expecteddossier)
 #
+
+    def test_gwhereclause(self):
+
+        expecteddossier = {"Queens,Queens,801990330.8"}
+
+        testwhereclause = "BORONAME = 'Queens'"
+
+        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
+                                                     ,self.testcolumn2
+                                                     ,self.testcolumn3)
+                                ,self.testdossierfile
+                                ,self.testcolumn3
+                                ,whereclause=testwhereclause)
+
+        self.assertEqual(self.borough.getdossier(self.testdossierfile)
+                        ,expecteddossier)
+
+        testwhereclause = "Shape__Area > 800000000"
+
+        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
+                                                     ,self.testcolumn2
+                                                     ,self.testcolumn3)
+                                ,self.testdossierfile
+                                ,self.testcolumn3
+                                ,whereclause=testwhereclause)
+
+        self.assertEqual(self.borough.getdossier(self.testdossierfile)
+                        ,expecteddossier)
+
+        expecteddossier = set()
+        testwhereclause = "BORONAME = 'Philadelphia'"
+
+        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
+                                                     ,self.testcolumn2
+                                                     ,self.testcolumn3)
+                                ,self.testdossierfile
+                                ,self.testcolumn3
+                                ,whereclause=testwhereclause)
+
+        self.assertEqual(self.borough.getdossier(self.testdossierfile)
+                        ,expecteddossier)
 
 if __name__ == '__main__':
     unittest.main()

@@ -11,7 +11,8 @@ class suspects:
                    ,dossierfile 
                    ,shapecolumn=None
                    ,rounddigits=1
-                   ,convertfactor=1):
+                   ,convertfactor=1
+                   ,whereclause=None):
 
         raise NotImplementedError("Subclasses implement this method")
 
@@ -36,14 +37,16 @@ class suspects:
                         ,dossierfile 
                         ,shapecolumn=None
                         ,rounddigits=1
-                        ,convertfactor=1):
+                        ,convertfactor=1
+                        ,whereclause=None):
 
         columnlist, shape_index = self._getcolumninfo(columns
                                                      ,shapecolumn)
-        
+
         with open(dossierfile, 'w') as f: 
             with arcpy.da.SearchCursor(self.layer
-                                      ,columnlist) as cursor:
+                                      ,columnlist
+                                      ,where_clause=whereclause) as cursor:
                 for row in cursor:
 
                     # convert tuple to list
@@ -153,7 +156,8 @@ class csclfeatureclass(suspects):
                    ,dossierfile 
                    ,shapecolumn=None
                    ,rounddigits=1
-                   ,convertfactor=1):
+                   ,convertfactor=1
+                   ,whereclause=None):
 
         arcpy.env.workspace = self.gdb
 
@@ -161,7 +165,8 @@ class csclfeatureclass(suspects):
                                 ,dossierfile 
                                 ,shapecolumn
                                 ,rounddigits
-                                ,convertfactor)
+                                ,convertfactor
+                                ,whereclause)
 
         arcpy.env.workspace = None
     
@@ -187,13 +192,15 @@ class hostedfeaturelayer(suspects):
                    ,dossierfile 
                    ,shapecolumn=None
                    ,rounddigits=1
-                   ,convertfactor=1):     
+                   ,convertfactor=1
+                   ,whereclause=None):     
 
         super()._getesrievidence(columns 
                                 ,dossierfile 
                                 ,shapecolumn
                                 ,rounddigits
-                                ,convertfactor)
+                                ,convertfactor
+                                ,whereclause)
 
 
 class postgistable(suspects):
@@ -212,7 +219,8 @@ class postgistable(suspects):
                    ,dossierfile
                    ,shapecolumn=None
                    ,rounddigits=1
-                   ,convertfactor=1):
+                   ,convertfactor=1
+                   ,whereclause=None):
 
         columnlist, shape_index = super()._getcolumninfo(columns
                                                         ,shapecolumn)
@@ -220,7 +228,8 @@ class postgistable(suspects):
         with open(dossierfile, 'w') as f: 
 
             # list of lists
-            rows = self._getrows(columns)
+            rows = self._getrows(columns
+                                ,whereclause)
 
             for row in rows:
 
@@ -239,7 +248,8 @@ class postgistable(suspects):
                 f.write(",".join(str(item) for item in row) + "\n")
 
     def _getrows(self
-                ,columns):
+                ,columns
+                ,whereclause):
 
         # this is the postgis class equivalent of 
         # arcpy.da.SearchCursor in the esri classes
@@ -247,11 +257,14 @@ class postgistable(suspects):
         sql = "select {0} from {1}".format(columns
                                           ,self.table)
 
+        if whereclause:
+            sql += """ where {0} """.format(whereclause)
+
         # tuples only, ignore user startup file, unaligned output   
         # except for database, connection is externalized   
-        psqlcmd =  'psql -d {0} -F {1} -tXA -c "{2}" '.format(self.pgdatabase
-                                                             ,','
-                                                             ,sql)
+        psqlcmd = 'psql -d {0} -F {1} -tXA -c "{2}" '.format(self.pgdatabase
+                                                            ,','
+                                                            ,sql)
         
         try:
             p1 = subprocess.Popen(psqlcmd
@@ -280,7 +293,7 @@ class postgistable(suspects):
         rows = [line.split(',') for line in outputstr.strip().splitlines()]
 
         # [['Queens', '4'], ['Manhattan', '5']]
-        # the comment commas are SOP python pretty-print, not real
+        # the commas are standard python pretty-print
 
         return self._tuplepoints(rows)
 

@@ -128,8 +128,46 @@ class InterrogatorPolyTestCase(unittest.TestCase):
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
                         ,expecteddossier)
 
+    def test_hwhereclause(self):
 
+        expecteddossier = {"Queens,Queens,4962897934.1"}
 
+        testwhereclause = "BORONAME = 'Queens'"
+
+        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
+                                                     ,self.testcolumn2
+                                                     ,self.testcolumn3)
+                                ,self.testdossierfile
+                                ,self.testcolumn3
+                                ,whereclause=testwhereclause)
+
+        self.assertEqual(self.borough.getdossier(self.testdossierfile)
+                        ,expecteddossier)
+
+        testwhereclause = "Shape_Area > 4000000000"
+
+        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
+                                                     ,self.testcolumn2
+                                                     ,self.testcolumn3)
+                                ,self.testdossierfile
+                                ,self.testcolumn3
+                                ,whereclause=testwhereclause)
+
+        self.assertEqual(self.borough.getdossier(self.testdossierfile)
+                        ,expecteddossier)
+
+        expecteddossier = set()
+        testwhereclause = "BORONAME = 'Philadelphia'"
+
+        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
+                                                     ,self.testcolumn2
+                                                     ,self.testcolumn3)
+                                ,self.testdossierfile
+                                ,self.testcolumn3
+                                ,whereclause=testwhereclause)
+
+        self.assertEqual(self.borough.getdossier(self.testdossierfile)
+                        ,expecteddossier)
         
 
 if __name__ == '__main__':
