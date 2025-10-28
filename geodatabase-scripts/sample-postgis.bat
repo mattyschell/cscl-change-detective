@@ -6,11 +6,13 @@ set CSCLGDB=%BASEPATH%\Connections\oracle19c\%ENV%\CSCL-%SRCDB%\cscl_read_only.s
 set CSCLLAYER=CSCL.XYZ
 set CSCLLAYERNAME=XYZ
 set CSCLLAYERCOLS=XYZ_ID
-set EXTERNALSOURCE=https://services5.arcgis.com/1234567/ArcGIS/rest/services/xyz/FeatureServer/0
+set EXTERNALSOURCE=abcdatabase
+set POSTGISTABLE=XYZ
 set EXTERNALLAYERCOLS=XYZ_ID
+set EXTERNALWHERECLAUSE="value='SpreadLoveItsTheBrooklynWay'"
 set LOGDIR=%BASEPATH%\cscl-change-detective\geodatabase-scripts\logs\%ENV%
 set NOTIFY=xxx@xxx.xxx.xxx
-set NOTIFYFROM=xxx@xxx.xxx.xx
+set NOTIFYFROM=xxx@xxx.xxx.xxx
 set SMTPFROM=xxxx.xxxx
 set PYTHON1=C:\Progra~1\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe
 set PYTHON2=C:\Users\%USERNAME%\AppData\Local\Programs\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe
@@ -28,7 +30,9 @@ CALL %PROPY% %BASEPATH%\cscl-change-detective\src\py\investigate.py ^
              %EXTERNALSOURCE% ^
              %EXTERNALLAYERCOLS% ^
              %EVIDENCEROOM% ^
-             %LOGDIR%
+             %LOGDIR% ^
+             --postgistable %POSTGISTABLE% ^
+             --externalwhereclause %EXTERNALWHERECLAUSE% 
 if %ERRORLEVEL% NEQ 0 (
     echo. >> %BATLOG%
     echo cscl-change-detective failed to run >> %BATLOG%

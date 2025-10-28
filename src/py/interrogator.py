@@ -2,7 +2,7 @@ import arcpy
 import os
 import subprocess
 import re
-
+import traceback
 
 class suspects:
 
@@ -44,27 +44,34 @@ class suspects:
                                                      ,shapecolumn)
 
         with open(dossierfile, 'w') as f: 
-            with arcpy.da.SearchCursor(self.layer
-                                      ,columnlist
-                                      ,where_clause=whereclause) as cursor:
-                for row in cursor:
+            try:
+                with arcpy.da.SearchCursor(self.layer
+                                          ,columnlist
+                                          ,where_clause=whereclause) as cursor:
+                    for row in cursor:
 
-                    # convert tuple to list
-                    row = list(row)
+                        # convert tuple to list
+                        row = list(row)
 
-                    if  shape_index is not None \
-                    and convertfactor != 1:
-                        row = self._convertrow(row
-                                              ,shape_index
-                                              ,convertfactor)
-                    
-                    if shape_index is not None:
-                        row = self._roundrow(row
-                                            ,shape_index
-                                            ,rounddigits)
+                        if  shape_index is not None \
+                        and convertfactor != 1:
+                            row = self._convertrow(row
+                                                ,shape_index
+                                                ,convertfactor)
+                        
+                        if shape_index is not None:
+                            row = self._roundrow(row
+                                                ,shape_index
+                                                ,rounddigits)
 
-                    # write the evidence to the dossier
-                    f.write(",".join(str(item) for item in row) + "\n")
+                        # write the evidence to the dossier
+                        f.write(",".join(str(item) for item in row) + "\n")
+            except Exception as e:
+                print('Error opening SearchCursor for')
+                print('   layer: {0}'.format(self.layer))
+                print('   columnlist: {0}'.format(columnlist))
+                print('   where clause: {0}'.format(whereclause))
+                raise ValueError(traceback.format_exc())
 
     def _getcolumninfo(self
                       ,columns

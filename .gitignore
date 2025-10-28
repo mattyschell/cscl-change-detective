@@ -6,3 +6,4 @@ scratch/
 evidenceroom/*
 !evidenceroom/**/.gitkeep
 geodatabase-scripts/historicdistrict*
+geodatabase-scripts/*mobilelatlong*

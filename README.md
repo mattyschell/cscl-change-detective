@@ -10,33 +10,62 @@ We will compare CSCL data to upstream or downstream sources. When one source cha
 2. Connectivity to a CSCL geodatabase
 3. Connectivity to the external layer (AGOL, PostGIS, etc)
 
-## Compare a CSCL Feature Layer to an AGOL Hosted Feature Layer
+## Investigate
+
+The output of any investigation will be raw intelligence dossiers in the evidence folder. The dossiers will be named like "borough" and "borough-suspect". 
+
+The output log will summarize the dirty dossiers. It will be in the log folder and named like investigate-Borough-20251027-151645.log 
+
+### Compare a CSCL Featureclass to an AGOL Hosted Feature Layer
 
 See geodatabase-scripts/sample-agol.bat.
 
-```bat
-python.exe src\py\investigate.py <geodatabase> 
-                                 <featureclass> 
-                                 <featureclass columns> 
-                                 <external layer> 
-                                 <external layer columns> 
-                                 <evidence folder> 
-                                 <log folder>
+python.exe .\src\py\investigate.py --help
+
+```text
+usage: investigate.py [-h] [--postgistable POSTGISTABLE] [--gdbwhereclause GDBWHERECLAUSE]
+                      [--externalwhereclause EXTERNALWHERECLAUSE] [--shapecolumn SHAPECOLUMN]
+                      [--externalshapecolumn EXTERNALSHAPECOLUMN] [--rounddigits ROUNDDIGITS]
+                      [--convertfactor CONVERTFACTOR]
+                      gdb gdblayer gdblayercols externalsource externallayercols evidenceroom logdir
+
+Investigate suspects
+
+positional arguments:
+  gdb                   Path to the cscl geodatabase
+  gdblayer              Featureclass name in cscl
+  gdblayercols          Comma delimited list of cscl columns
+  externalsource        External layer url or database name
+  externallayercols     Comma delimited list of external columns
+  evidenceroom          Directory for evidence storage
+  logdir                Directory for logs
+
+options:
+  -h, --help            show this help message and exit
+  --postgistable POSTGISTABLE
+                        External postgis table name
+  --gdbwhereclause GDBWHERECLAUSE
+                        Where clause for cscl
+  --externalwhereclause EXTERNALWHERECLAUSE
+                        Where clause for external
+  --shapecolumn SHAPECOLUMN
+                        Name of the approximating cscl shape column
+  --externalshapecolumn EXTERNALSHAPECOLUMN
+                        Name of the approximating external shape column
+  --rounddigits ROUNDDIGITS
+                        Number of digits to round shape values
+  --convertfactor CONVERTFACTOR
+                        Conversion factor for shape values
 ```
 
-### Positional Arguments
+### Compare a CSCL Featureclass to a PostGIS Table 
 
-| Position | Name | Example | Description |
-|----------|------|-------------|---------|
-| 1 | `geodatabase` | `C:\temp\cscl_read_only.sde` | SDE file to geodatabase |
-| 2 | `featureclass` | `CSCL_PUB.HistoricDistrict` | Full path to feature class |
-| 3 | `featureclass columns`  | `LP_NUMBER,SHAPE_AREA` | Comma-delimited list of columns |
-| 4 | `external layer` | `https://services5.arcgis.com/ab..12/ArcGIS/rest/` `services/Historic_Districts/FeatureServer/0` | Upstream or downstream hosted feature layer |
-| 5 | `external layer columns`  | `LP_NUMBER,SHAPE__AREA` | External columns matching featureclass columns |
-| 6 | `evidence folder`  | `C:\temp\evidenceroom` | Dossier destination |
-| 7 | `log folder`  | `C:\temp\logs` | Full log goes here. notify.py will pick this up |
-
-The output of the investigation will be raw dossiers named like "featureclass" and "featureclass-suspect" in the evidence folder. The full log will summarize differences, if any.
+```bat
+> set PGHOST=xyz
+> set PGUSER=abc
+> set PGPASSWORD=SpreadLoveItsTheBrooklynWay
+> geodatabase-scripts\sample-postgis.bat
+```
 
 ## Tests
 
