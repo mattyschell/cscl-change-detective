@@ -1,26 +1,26 @@
 # CSCL-CHANGE-DETECTIVE
 
-We will compare CSCL data to upstream or downstream sources. When one source changes we will send interpol notices to alert the data police that suspect data is on the lam. Friends, this is our data gumshoe, our laws, the trick is never to be afraid. 
+We will compare CSCL data to upstream or downstream sources. When one source changes we will send interpol notices to alert the data cops that suspect data is on the lam. Friends, this is our data gumshoe, our data laws, the trick is never to be afraid. 
 
 ![whereintheworld](./adventure.png)
 
 ## Dependencies
 
-1. Arcpy
-2. Connectivity to a CSCL geodatabase
-3. Connectivity to the external layer (AGOL, PostGIS, etc)
+1. [Arcpy](https://pro.arcgis.com/en/pro-app/latest/arcpy/get-started/what-is-arcpy-.htm)
+2. Connectivity to a [CSCL](https://github.com/CityOfNewYork/nyc-geo-metadata/blob/main/Metadata/CSCL.md) geodatabase
+3. Connectivity to the external layer ([ArcGIS Online](https://nyc.maps.arcgis.com/home/index.html), [PostGIS](https://github.com/mattyschell/howdoipostgis), more TBD)
 
 ## Investigate
 
 The output of any investigation will be raw intelligence dossiers in the evidence folder. The dossiers will be named like "borough" and "borough-suspect". 
 
-The output log will summarize the dirty dossiers. It will be in the log folder and named like investigate-Borough-20251027-151645.log 
+The output log will summarize these dirty dossiers. The log will unsurprisingly be in the log folder and named like investigate-Borough-20251027-151645.log 
 
-### Compare a CSCL Featureclass to an AGOL Hosted Feature Layer
+### Compare a CSCL Featureclass to an ArcGIS Online Hosted Feature Layer
 
 See geodatabase-scripts/sample-agol.bat.
 
-python.exe .\src\py\investigate.py --help
+python.exe .\py\investigate.py --help
 
 ```text
 usage: investigate.py [-h] [--postgistable POSTGISTABLE] [--gdbwhereclause GDBWHERECLAUSE]
@@ -29,7 +29,7 @@ usage: investigate.py [-h] [--postgistable POSTGISTABLE] [--gdbwhereclause GDBWH
                       [--convertfactor CONVERTFACTOR]
                       gdb gdblayer gdblayercols externalsource externallayercols evidenceroom logdir
 
-Investigate suspects
+Investigate a suspect
 
 positional arguments:
   gdb                   Path to the cscl geodatabase
@@ -37,8 +37,8 @@ positional arguments:
   gdblayercols          Comma delimited list of cscl columns
   externalsource        External layer url or database name
   externallayercols     Comma delimited list of external columns
-  evidenceroom          Directory for evidence storage
-  logdir                Directory for logs
+  evidenceroom          Folder for evidence storage
+  logdir                Folder for logs
 
 options:
   -h, --help            show this help message and exit
@@ -59,6 +59,8 @@ options:
 ```
 
 ### Compare a CSCL Featureclass to a PostGIS Table 
+
+See geodatabase-scripts/sample-postgis.bat
 
 ```bat
 > set PGHOST=xyz

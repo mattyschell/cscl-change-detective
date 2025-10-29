@@ -5,12 +5,12 @@ if exist "%PYTHON1%" (
 ) else if exist "%PYTHON2%" (
     set PROPY=%PYTHON2%
 ) 
-call %PROPY% .\src\py\test_interrogator_polygon.py
-call %PROPY% .\src\py\test_interrogator_point.py
-call %PROPY% .\src\py\test_interrogator_line.py
-call %PROPY% .\src\py\test_interrogator_polygon_agol.py
+call %PROPY% .\test\test_interrogator_polygon.py
+call %PROPY% .\test\test_interrogator_point.py
+call %PROPY% .\test\test_interrogator_line.py
+call %PROPY% .\test\test_interrogator_polygon_agol.py
 set PGUSER=postgres
 set PGDATABASE=postgres
 set PGHOST=localhost
-call %PROPY% .\src\py\test_interrogator_polygon_postgis.py
-call %PROPY% .\src\py\test_interrogator_point_postgis.py
+%PROPY% .\test\test_interrogator_polygon_postgis.py
+%PROPY% .\test\test_interrogator_point_postgis.py
