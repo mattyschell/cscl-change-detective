@@ -54,7 +54,7 @@ def main():
     if 'WARNING' in content:
         msg.set_content(content) 
     else:
-        msg.set_content('No evidence to report') 
+        msg.set_content('PASS. We found no evidence that the external dataset differs from CSCL.') 
         
     try:
         smtp.sendmail(msg['From']
