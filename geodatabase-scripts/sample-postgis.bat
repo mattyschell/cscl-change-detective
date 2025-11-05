@@ -3,6 +3,7 @@ set SRCDB=xxxx
 set BASEPATH=C:\gis
 set EVIDENCEROOM=%BASEPATH%\cscl-change-detective\evidenceroom\%ENV%
 set CSCLGDB=%BASEPATH%\Connections\oracle19c\%ENV%\CSCL-%SRCDB%\cscl_read_only.sde
+REM use CSCL_PUB if the CSCL source has class extensions
 set CSCLLAYER=CSCL.XYZ
 set CSCLLAYERNAME=XYZ
 set CSCLLAYERCOLS=XYZ_ID
@@ -36,9 +37,9 @@ CALL %PROPY% %BASEPATH%\cscl-change-detective\py\investigate.py ^
 if %ERRORLEVEL% NEQ 0 (
     echo. >> %BATLOG%
     echo cscl-change-detective failed to run >> %BATLOG%
-    %PROPY% %BASEPATH%\cscl-change-detective\py\notify.py ": %CSCLLAYERNAME% cscl-change-detective failed to run" %NOTIFY% NOLOG %LOGDIR% %NOTIFYFROM% %SMTPFROM%
+    %PROPY% %BASEPATH%\cscl-change-detective\py\notify.py ": %CSCLLAYERNAME% (%ENV%) cscl-change-detective failed to run" %NOTIFY% NOLOG %LOGDIR% %NOTIFYFROM% %SMTPFROM%
     EXIT /B 0
 ) 
-%PROPY% %BASEPATH%\cscl-change-detective\py\notify.py ": %CSCLLAYERNAME% cscl-change-detective" %NOTIFY% %CSCLLAYERNAME% %LOGDIR% %NOTIFYFROM% %SMTPFROM%
+CALL %PROPY% %BASEPATH%\cscl-change-detective\py\notify.py ": %CSCLLAYERNAME% (%ENV%) cscl-change-detective" %NOTIFY% %CSCLLAYERNAME% %LOGDIR% %NOTIFYFROM% %SMTPFROM%
 echo. >> %BATLOG% && echo completed %ENV% %CSCLLAYER% on %date% at %time% >> %BATLOG%
    

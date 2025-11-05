@@ -40,25 +40,29 @@ def main():
     content += 'at {0} {1}'.format(datetime.datetime.now()
                                   ,os.linesep)
 
-    # NOLOG input on failures 
-    if plogtype != 'NOLOG':
+    if plogtype == 'NOLOG':
+        # NOLOG is plogtype on failures 
+        content = 'FAIL. No evidence to report. Check the logs in {}'.format(plogdir)
+        msg.set_content(content) 
+    else: 
         content += '\n' + getlogfile(plogdir
-                                    ,plogtype)   
+                                    ,plogtype)  
+        if 'WARNING' in content:
+            # report log details
+            msg.set_content(content) 
+        else:
+            # we dont need the log, keep it simple
+            msg.set_content('PASS. We found no evidence that the external dataset differs from CSCL.') 
     
     smtp = smtplib.SMTP(psmtpfrom)  
     msg['From'] = pemailfrom
     # this is headers only 
     # if a string is passed to sendmail it is treated as a list with one element!
     msg['To'] = pemails
-
-    if 'WARNING' in content:
-        msg.set_content(content) 
-    else:
-        msg.set_content('PASS. We found no evidence that the external dataset differs from CSCL.') 
-        
+  
     try:
         smtp.sendmail(msg['From']
-                        ,msg['To'].split(",")
+                    ,msg['To'].split(",")
                         ,msg.as_string())
     except smtplib.SMTPRecipientsRefused as e:
         print("\n notify.py - Email not sent: relaying denied.")

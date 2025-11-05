@@ -4,6 +4,10 @@ scratch/
 *.lock
 *.log
 evidenceroom/*
-!evidenceroom/**/.gitkeep
-geodatabase-scripts/historicdistrict*
-geodatabase-scripts/*mobilelatlong*
+# only sample scripts allowed
+geodatabase-scripts/*
+!geodatabase-scripts/*sample*
+
+
+
+
