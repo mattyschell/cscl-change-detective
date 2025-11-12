@@ -45,17 +45,17 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
     def test_bgetmoreevidence(self):
 
-        self.borough.getevidence('{0},{1}'.format(self.testcolumn1
-                                                 ,self.testcolumn2)
+        self.borough.getevidence('{0}|||{1}'.format(self.testcolumn1
+                                                   ,self.testcolumn2)
                                 ,self.testdossierfile)
 
         self.assertTrue(os.path.isfile(self.testdossierfile))
 
     def test_caddshape(self):
 
-        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
-                                                     ,self.testcolumn2
-                                                     ,self.testcolumn3)
+        self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
+                                                         ,self.testcolumn2
+                                                         ,self.testcolumn3)
                                 ,self.testdossierfile)
 
         self.assertTrue(os.path.isfile(self.testdossierfile))
@@ -69,9 +69,9 @@ class InterrogatorPolyTestCase(unittest.TestCase):
                           ,"Staten Island,Richmond,2851517714.98682"}
                           
 
-        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
-                                                     ,self.testcolumn2
-                                                     ,self.testcolumn3)
+        self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
+                                                         ,self.testcolumn2
+                                                         ,self.testcolumn3)
                                 ,self.testdossierfile)
 
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
@@ -85,9 +85,9 @@ class InterrogatorPolyTestCase(unittest.TestCase):
                           ,"Brooklyn,Kings,2697660950.4"
                           ,"Staten Island,Richmond,2851517715.0"}
 
-        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
-                                                     ,self.testcolumn2
-                                                     ,self.testcolumn3)
+        self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
+                                                         ,self.testcolumn2
+                                                         ,self.testcolumn3)
                                 ,self.testdossierfile
                                 ,self.testcolumn3)
 
@@ -102,9 +102,9 @@ class InterrogatorPolyTestCase(unittest.TestCase):
                           ,"Brooklyn,Kings,2697660950"
                           ,"Staten Island,Richmond,2851517710"} 
 
-        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
-                                                     ,self.testcolumn2
-                                                     ,self.testcolumn3)
+        self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
+                                                         ,self.testcolumn2
+                                                         ,self.testcolumn3)
                                 ,self.testdossierfile
                                 ,self.testcolumn3
                                 ,-1)
@@ -120,9 +120,9 @@ class InterrogatorPolyTestCase(unittest.TestCase):
                           ,"Brooklyn,Kings,2697660950"
                           ,"Staten Island,Richmond,2851517715"}
 
-        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
-                                                     ,self.testcolumn2
-                                                     ,self.testcolumn3)
+        self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
+                                                         ,self.testcolumn2
+                                                         ,self.testcolumn3)
                                 ,self.testdossierfile
                                 ,self.testcolumn3
                                 ,0)
@@ -136,9 +136,9 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
         testwhereclause = "BORONAME = 'Queens'"
 
-        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
-                                                     ,self.testcolumn2
-                                                     ,self.testcolumn3)
+        self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
+                                                         ,self.testcolumn2
+                                                         ,self.testcolumn3)
                                 ,self.testdossierfile
                                 ,self.testcolumn3
                                 ,whereclause=testwhereclause)
@@ -148,9 +148,9 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
         testwhereclause = "Shape_Area > 4000000000"
 
-        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
-                                                     ,self.testcolumn2
-                                                     ,self.testcolumn3)
+        self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
+                                                         ,self.testcolumn2
+                                                         ,self.testcolumn3)
                                 ,self.testdossierfile
                                 ,self.testcolumn3
                                 ,whereclause=testwhereclause)
@@ -161,9 +161,9 @@ class InterrogatorPolyTestCase(unittest.TestCase):
         expecteddossier = set()
         testwhereclause = "BORONAME = 'Philadelphia'"
 
-        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
-                                                     ,self.testcolumn2
-                                                     ,self.testcolumn3)
+        self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
+                                                         ,self.testcolumn2
+                                                         ,self.testcolumn3)
                                 ,self.testdossierfile
                                 ,self.testcolumn3
                                 ,whereclause=testwhereclause)

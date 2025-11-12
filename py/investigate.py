@@ -49,9 +49,9 @@ def main():
     # Required arguments
     parser.add_argument("gdb", help="Path to the cscl geodatabase")
     parser.add_argument("gdblayer", help="Featureclass name in cscl")
-    parser.add_argument("gdblayercols", help="Comma delimited list of cscl columns")
+    parser.add_argument("gdblayercols", help="Triple pipe delimited list of cscl columns")
     parser.add_argument("externalsource", help="External layer url or database name")
-    parser.add_argument("externallayercols", help="Comma delimited list of external columns")
+    parser.add_argument("externallayercols", help="Triple pipe delimited list of external columns")
     parser.add_argument("evidenceroom", help="Folder for evidence storage")
     parser.add_argument("logdir", help="Folder for logs")
 

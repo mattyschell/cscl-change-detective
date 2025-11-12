@@ -37,9 +37,9 @@ CALL %PROPY% %BASEPATH%\cscl-change-detective\py\investigate.py ^
 if %ERRORLEVEL% NEQ 0 (
     echo. >> %BATLOG%
     echo cscl-change-detective failed to run >> %BATLOG%
-    %PROPY% %BASEPATH%\cscl-change-detective\py\notify.py ": %CSCLLAYERNAME% (%ENV%) cscl-change-detective failed to run" %NOTIFY% NOLOG %LOGDIR% %NOTIFYFROM% %SMTPFROM%
+    %PROPY% %BASEPATH%\cscl-change-detective\py\notify.py "%CSCLLAYERNAME% on %EXTERNALSOURCE% (%ENV%) - cscl-change-detective failed to run" %NOTIFY% NOLOG %LOGDIR% %NOTIFYFROM% %SMTPFROM%
     EXIT /B 0
 ) 
-CALL %PROPY% %BASEPATH%\cscl-change-detective\py\notify.py ": %CSCLLAYERNAME% (%ENV%) cscl-change-detective" %NOTIFY% %CSCLLAYERNAME% %LOGDIR% %NOTIFYFROM% %SMTPFROM%
+CALL %PROPY% %BASEPATH%\cscl-change-detective\py\notify.py "%CSCLLAYERNAME% on %EXTERNALSOURCE% (%ENV%) - cscl-change-detective" %NOTIFY% %CSCLLAYERNAME% %LOGDIR% %NOTIFYFROM% %SMTPFROM%
 echo. >> %BATLOG% && echo completed %ENV% %CSCLLAYER% on %date% at %time% >> %BATLOG%
-   
+ 

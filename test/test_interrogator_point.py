@@ -56,8 +56,8 @@ class InterrogatorPointTestCase(unittest.TestCase):
                           ,"2,(1030095.9494018555, 257745.85382080078)"
                           ,"5,(1031187.4111938477, 254226.90600585938)"}
 
-        self.milepost.getevidence('{0},{1}'.format(self.testcolumn1
-                                                  ,self.testcolumn2)
+        self.milepost.getevidence('{0}|||{1}'.format(self.testcolumn1
+                                                    ,self.testcolumn2)
                                 ,self.testdossierfile)
 
         self.assertEqual(self.milepost.getdossier(self.testdossierfile)
@@ -71,8 +71,8 @@ class InterrogatorPointTestCase(unittest.TestCase):
                           ,"2,(1030095.9, 257745.9)"
                           ,"5,(1031187.4, 254226.9)"}
 
-        self.milepost.getevidence('{0},{1}'.format(self.testcolumn1
-                                                  ,self.testcolumn2)
+        self.milepost.getevidence('{0}|||{1}'.format(self.testcolumn1
+                                                    ,self.testcolumn2)
                                 ,self.testdossierfile
                                 ,self.testcolumn2)
 
@@ -87,11 +87,11 @@ class InterrogatorPointTestCase(unittest.TestCase):
                           ,"2,(1030100, 257750)"
                           ,"5,(1031190, 254230)"}
 
-        self.milepost.getevidence('{0},{1}'.format(self.testcolumn1
-                                                  ,self.testcolumn2)
-                                ,self.testdossierfile
-                                ,self.testcolumn2
-                                ,-1)
+        self.milepost.getevidence('{0}|||{1}'.format(self.testcolumn1
+                                                    ,self.testcolumn2)
+                                 ,self.testdossierfile
+                                 ,self.testcolumn2
+                                 ,-1)
 
         self.assertEqual(self.milepost.getdossier(self.testdossierfile)
                         ,expecteddossier)

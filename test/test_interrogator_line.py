@@ -43,8 +43,8 @@ class InterrogatorLineTestCase(unittest.TestCase):
 
     def test_baddshape(self):
 
-        self.subway.getevidence('{0},{1}'.format(self.testcolumn1
-                                                ,self.testcolumn2)
+        self.subway.getevidence('{0}|||{1}'.format(self.testcolumn1
+                                                  ,self.testcolumn2)
                                 ,self.testdossierfile)
 
         self.assertTrue(os.path.isfile(self.testdossierfile))
@@ -57,8 +57,8 @@ class InterrogatorLineTestCase(unittest.TestCase):
                           ,"8100838,262.6696706688732"
                           ,"8100836,287.4570346063792"}
 
-        self.subway.getevidence('{0},{1}'.format(self.testcolumn1
-                                                ,self.testcolumn2)
+        self.subway.getevidence('{0}|||{1}'.format(self.testcolumn1
+                                                  ,self.testcolumn2)
                                 ,self.testdossierfile)
 
         self.assertEqual(self.subway.getdossier(self.testdossierfile)
@@ -72,8 +72,8 @@ class InterrogatorLineTestCase(unittest.TestCase):
                           ,"8100838,262.7"
                           ,"8100836,287.5"}
 
-        self.subway.getevidence('{0},{1}'.format(self.testcolumn1
-                                                ,self.testcolumn2)
+        self.subway.getevidence('{0}|||{1}'.format(self.testcolumn1
+                                                  ,self.testcolumn2)
                                 ,self.testdossierfile
                                 ,self.testcolumn2)
 

@@ -81,7 +81,7 @@ class suspects:
         # get shape index of the list if it exists
         # this is shared by all children
 
-        columnlist = [f.strip() for f in columns.split(",")]
+        columnlist = [f.strip() for f in columns.split("|||")]
 
         # we support rounding and converting one column only (for now (forever?))
         try:
@@ -235,7 +235,7 @@ class postgistable(suspects):
         with open(dossierfile, 'w') as f: 
 
             # list of lists
-            rows = self._getrows(columns
+            rows = self._getrows(','.join(str(col) for col in columnlist)
                                 ,whereclause)
 
             for row in rows:
