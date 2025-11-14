@@ -16,6 +16,7 @@ class InterrogatorPolyTestCase(unittest.TestCase):
         cls.testcolumn1 = 'BORONAME'
         cls.testcolumn2 = 'COUNTY'
         # hosted feature layers add an underscore to avoid conflicts with storage layers
+        # usualy these are lousy web mercator and worthless
         cls.testcolumn3 = 'SHAPE__Area'
 
         cls.testdossierfile = os.path.join(os.path.dirname(__file__)
@@ -23,10 +24,7 @@ class InterrogatorPolyTestCase(unittest.TestCase):
                                           ,'testdossier')
 
         cls.borough = interrogator.hostedfeaturelayer(cls.testurl
-                                                     ,cls.testlayer)
-
-        # thats right
-        #cls.agol_fudge_factor = 1/1.745489                   
+                                                     ,cls.testlayer)            
 
     def tearDown(self):
 

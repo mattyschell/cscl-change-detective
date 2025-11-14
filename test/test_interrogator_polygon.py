@@ -17,10 +17,11 @@ class InterrogatorPolyTestCase(unittest.TestCase):
         cls.testlayer   = 'Borough'
         cls.testcolumn1 = 'BORONAME'
         cls.testcolumn2 = 'COUNTY'
-        # KISS - iterrogator should know if we are doing area, pointxy, etc
         # this could also be SHAPE.AREA
         # the casing does not seem to matter. not sure what the pattern is, weird
         cls.testcolumn3 = 'Shape_Area'
+        # calculated area
+        cls.testcolumn4 = 'SHAPE@AREA'
 
         cls.testdossierfile = os.path.join(os.path.dirname(__file__)
                                           ,'testdata'
@@ -167,6 +168,26 @@ class InterrogatorPolyTestCase(unittest.TestCase):
                                 ,self.testdossierfile
                                 ,self.testcolumn3
                                 ,whereclause=testwhereclause)
+
+        self.assertEqual(self.borough.getdossier(self.testdossierfile)
+                        ,expecteddossier)
+
+    def test_icalcshape(self):
+
+        # TODO: find out why stored shape_area and 
+        # calculated SHAPE@AREA differ
+        # Hopefully smaller shapes will not be so impacted
+        expecteddossier = {"Queens,4962898000" 
+                          ,"Manhattan,944329000"
+                          ,"Bronx,1598501000"
+                          ,"Brooklyn,2697661000"
+                          ,"Staten Island,2851518000"}
+
+        self.borough.getevidence('{0}|||{1}'.format(self.testcolumn1
+                                                   ,self.testcolumn4)
+                                ,self.testdossierfile
+                                ,self.testcolumn4
+                                ,-3) 
 
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
                         ,expecteddossier)
