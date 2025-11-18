@@ -15,9 +15,12 @@ class InterrogatorPolyTestCase(unittest.TestCase):
         cls.testlayer   = 'Borough'
         cls.testcolumn1 = 'BORONAME'
         cls.testcolumn2 = 'COUNTY'
+
         # hosted feature layers add an underscore to avoid conflicts with storage layers
         # usualy these are lousy web mercator and worthless
-        cls.testcolumn3 = 'SHAPE__Area'
+        cls.areacolumn = 'SHAPE__Area'
+        # centroid
+        cls.centroidcalculated = 'SHAPE@XY'
 
         cls.testdossierfile = os.path.join(os.path.dirname(__file__)
                                           ,'testdata'
@@ -52,7 +55,7 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
         self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
                                                          ,self.testcolumn2
-                                                         ,self.testcolumn3)
+                                                         ,self.areacolumn)
                                 ,self.testdossierfile)
 
         self.assertTrue(os.path.isfile(self.testdossierfile))
@@ -68,7 +71,7 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
         self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
                                                          ,self.testcolumn2
-                                                         ,self.testcolumn3)
+                                                         ,self.areacolumn)
                                 ,self.testdossierfile)
 
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
@@ -84,9 +87,9 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
         self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
                                                          ,self.testcolumn2
-                                                         ,self.testcolumn3)
+                                                         ,self.areacolumn)
                                 ,self.testdossierfile
-                                ,self.testcolumn3
+                                ,self.areacolumn
                                 ,0)
 
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
@@ -103,39 +106,16 @@ class InterrogatorPolyTestCase(unittest.TestCase):
                                                    
         self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
                                                          ,self.testcolumn2
-                                                         ,self.testcolumn3)
+                                                         ,self.areacolumn)
                                 ,self.testdossierfile
-                                ,self.testcolumn3
+                                ,self.areacolumn
                                 ,0
                                 ,10.7639104)
 
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
                         ,expecteddossier)
 
-#    def test_fmatchcscldossier(self):
-#        # converting square meters to square feet should match
-#        # the file geodatabase in this repo (with sufficient rounding)
-#        # however AGOL Shape__Area values are being calculated in lousy web mercator
-#        # for now we have no solution
-#        expecteddossier = {"Queens,Queens,4962900000"
-#                          ,"Manhattan,New York,944330000"
-#                          ,"Bronx,Bronx,1598500000"
-#                          ,"Brooklyn,Kings,2697660000"
-#                          ,"Staten Island,Richmond,2851520000"}
-#                                                   
-#        self.borough.getevidence('{0},{1},{2}'.format(self.testcolumn1
-#                                                     ,self.testcolumn2
-#                                                     ,self.testcolumn3)
-#                                ,self.testdossierfile
-#                                ,self.testcolumn3
-#                                ,-4
-#                                ,(10.7639104 * self.agol_fudge_factor))
-#
-#        self.assertEqual(self.borough.getdossier(self.testdossierfile)
-#                        ,expecteddossier)
-#
-
-    def test_gwhereclause(self):
+    def test_fwhereclause(self):
 
         expecteddossier = {"Queens,Queens,801990330.8"}
 
@@ -143,9 +123,9 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
         self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
                                                          ,self.testcolumn2
-                                                         ,self.testcolumn3)
+                                                         ,self.areacolumn)
                                 ,self.testdossierfile
-                                ,self.testcolumn3
+                                ,self.areacolumn
                                 ,whereclause=testwhereclause)
 
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
@@ -155,9 +135,9 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
         self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
                                                          ,self.testcolumn2
-                                                         ,self.testcolumn3)
+                                                         ,self.areacolumn)
                                 ,self.testdossierfile
-                                ,self.testcolumn3
+                                ,self.areacolumn
                                 ,whereclause=testwhereclause)
 
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
@@ -168,10 +148,45 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
         self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
                                                          ,self.testcolumn2
-                                                         ,self.testcolumn3)
+                                                         ,self.areacolumn)
                                 ,self.testdossierfile
-                                ,self.testcolumn3
+                                ,self.areacolumn
                                 ,whereclause=testwhereclause)
+
+        self.assertEqual(self.borough.getdossier(self.testdossierfile)
+                        ,expecteddossier)
+
+    def test_gcalccentroid(self):
+
+        #expected
+        #select boroname 
+        #	|| ',(' 
+        #	|| ROUND(SDO_GEOM.SDO_CENTROID(sdo_cs.transform(
+        #              SDO_GEOM.SDO_ARC_DENSIFY(a.shape, .005, 'arc_tolerance=0.5 unit=foot')
+        #                       ,3857)).sdo_point.x
+        #             , -1) 
+        #	|| ', ' 
+        #	|| ROUND(SDO_GEOM.SDO_CENTROID(sdo_cs.transform(
+        #              SDO_GEOM.SDO_ARC_DENSIFY(a.shape, .005, 'arc_tolerance=0.5 unit=foot')
+        #                       ,3857)).sdo_point.y
+        #            ,-1)
+        #	|| ')'
+        #from 
+        #	cscl_pub.borough a
+
+        expecteddossier = {"Staten Island,(-8253040, 4948010)"
+                          ,"Queens,(-8219690, 4961980)"
+                          ,"Brooklyn,(-8232090, 4958560)"
+                          ,"Bronx,(-8221300, 4990130)"
+                          ,"Manhattan,(-8234290, 4979110)"}
+
+        # in this particular case the Y value differs by 1 foot for 4 of the boroughs
+        # rounding to tens place is not strictly necessary. just a reminder to self 
+        self.borough.getevidence('{0}|||{1}'.format(self.testcolumn1
+                                                   ,self.centroidcalculated)
+                                ,self.testdossierfile
+                                ,self.centroidcalculated
+                                ,-1) 
 
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
                         ,expecteddossier)

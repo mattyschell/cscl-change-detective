@@ -59,8 +59,8 @@ def main():
     parser.add_argument("--postgistable", help="External postgis table name", default=None)
     parser.add_argument("--gdbwhereclause", help="Where clause for cscl", default=None)
     parser.add_argument("--externalwhereclause", help="Where clause for external", default=None)
-    parser.add_argument("--shapecolumn", help="Name of the approximating cscl shape column", default=None)
-    parser.add_argument("--externalshapecolumn", help="Name of the approximating external shape column", default=None)
+    parser.add_argument("--shapecolumn", help="Name of the derived cscl shape column", default=None)
+    parser.add_argument("--externalshapecolumn", help="Name of the derived external shape column", default=None)
     # these next two may need to be split into cscl vs external if units cause issues
     parser.add_argument("--rounddigits", type=int, help="Number of digits to round shape values", default=1)
     parser.add_argument("--convertfactor", type=float, help="Conversion factor for shape values", default=1.0)

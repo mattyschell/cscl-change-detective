@@ -11,12 +11,13 @@ class InterrogatorPolyTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
 
-        cls.testdatabase = 'csclchangedetective'
-        cls.testlayer   = 'borough'
-        cls.testcolumn1 = 'boroname'
-        cls.testcolumn2 = 'county'
-        cls.testcolumn3 = 'shape_area'
-        cls.testcolumn4 = 'st_area(geom)'
+        cls.testdatabase       = 'csclchangedetective'
+        cls.testlayer          = 'borough'
+        cls.testcolumn1        = 'boroname'
+        cls.testcolumn2        = 'county'
+        cls.areacolumn         = 'shape_area'
+        cls.areacalculated     = 'st_area(geom)'
+        cls.centroidcalculated = 'st_astext(st_centroid(geom))'
 
         cls.testdossierfile = os.path.join(os.path.dirname(__file__)
                                           ,'testdata'
@@ -81,7 +82,7 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
         self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
                                                          ,self.testcolumn2
-                                                         ,self.testcolumn3)
+                                                         ,self.areacolumn)
                                 ,self.testdossierfile)
 
         self.assertTrue(os.path.isfile(self.testdossierfile))
@@ -96,7 +97,7 @@ class InterrogatorPolyTestCase(unittest.TestCase):
                           
         self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
                                                          ,self.testcolumn2
-                                                         ,self.testcolumn3)
+                                                         ,self.areacolumn)
                                 ,self.testdossierfile)
 
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
@@ -112,9 +113,9 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
         self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
                                                          ,self.testcolumn2
-                                                         ,self.testcolumn3)
+                                                         ,self.areacolumn)
                                 ,self.testdossierfile
-                                ,self.testcolumn3)
+                                ,self.areacolumn)
 
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
                         ,expecteddossier)
@@ -129,9 +130,9 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
         self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
                                                          ,self.testcolumn2
-                                                         ,self.testcolumn3)
+                                                         ,self.areacolumn)
                                 ,self.testdossierfile
-                                ,self.testcolumn3
+                                ,self.areacolumn
                                 ,-1)
 
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
@@ -147,9 +148,9 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
         self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
                                                      ,self.testcolumn2
-                                                     ,self.testcolumn3)
+                                                     ,self.areacolumn)
                                 ,self.testdossierfile
-                                ,self.testcolumn3
+                                ,self.areacolumn
                                 ,0)
 
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
@@ -163,9 +164,9 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
         self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
                                                          ,self.testcolumn2
-                                                         ,self.testcolumn3)
+                                                         ,self.areacolumn)
                                 ,self.testdossierfile
-                                ,self.testcolumn3
+                                ,self.areacolumn
                                 ,whereclause=testwhereclause)
 
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
@@ -175,9 +176,9 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
         self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
                                                          ,self.testcolumn2
-                                                         ,self.testcolumn3)
+                                                         ,self.areacolumn)
                                 ,self.testdossierfile
-                                ,self.testcolumn3
+                                ,self.areacolumn
                                 ,whereclause=testwhereclause)
 
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
@@ -188,9 +189,9 @@ class InterrogatorPolyTestCase(unittest.TestCase):
 
         self.borough.getevidence('{0}|||{1}|||{2}'.format(self.testcolumn1
                                                          ,self.testcolumn2
-                                                         ,self.testcolumn3)
+                                                         ,self.areacolumn)
                                 ,self.testdossierfile
-                                ,self.testcolumn3
+                                ,self.areacolumn
                                 ,whereclause=testwhereclause)
 
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
@@ -209,10 +210,36 @@ class InterrogatorPolyTestCase(unittest.TestCase):
                           ,"Staten Island,2851517700"}
                           
         self.borough.getevidence('{0}|||{1}'.format(self.testcolumn1
-                                                 ,self.testcolumn4)
+                                                   ,self.areacalculated)
                                 ,self.testdossierfile
-                                ,shapecolumn=self.testcolumn4
+                                ,shapecolumn=self.areacalculated
                                 ,rounddigits=-2)
+
+        self.assertEqual(self.borough.getdossier(self.testdossierfile)
+                        ,expecteddossier)
+
+    def test_jcalccentroid(self):
+
+        # SELECT 
+        #    boroname 
+        #    || ',(' 
+        #    || CAST(ST_X(ST_Centroid(geom)) AS numeric(10)) 
+        #    || ', '
+        #    || CAST(ST_Y(ST_Centroid(geom)) AS numeric(10))
+        #    || ')'
+        # FROM borough;
+
+        expecteddossier = {"Queens,(1028960, 178826)" 
+                          ,"Manhattan,(992576, 221353)"
+                          ,"Bronx,(1024862, 248694)"
+                          ,"Brooklyn,(998089, 170378)"
+                          ,"Staten Island,(945821, 144185)"}
+
+        self.borough.getevidence('{0}|||{1}'.format(self.testcolumn1
+                                                   ,self.centroidcalculated)
+                                ,self.testdossierfile
+                                ,self.centroidcalculated
+                                ,0) 
 
         self.assertEqual(self.borough.getdossier(self.testdossierfile)
                         ,expecteddossier)

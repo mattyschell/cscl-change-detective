@@ -4,12 +4,12 @@ set BASEPATH=C:\gis
 set EVIDENCEROOM=%BASEPATH%\cscl-change-detective\evidenceroom\%ENV%
 set CSCLGDB=%BASEPATH%\Connections\oracle19c\%ENV%\CSCL-%SRCDB%\cscl_read_only.sde
 REM use CSCL_PUB if the CSCL source has class extensions
-set CSCLLAYER=CSCL.XYZ
+set CSCLLAYER=CSCL_PUB.XYZ
 set CSCLLAYERNAME=XYZ
-set CSCLLAYERCOLS=XYZ_ID
+set CSCLLAYERCOLS=XYZ_ID||SHAPE@XY
 set EXTERNALSOURCE=abcdatabase
 set POSTGISTABLE=XYZ
-set EXTERNALLAYERCOLS=XYZ_ID
+set EXTERNALLAYERCOLS=XYZ_ID||st_astext(st_centroid(geom))
 set EXTERNALWHERECLAUSE="value='SpreadLoveItsTheBrooklynWay'"
 set LOGDIR=%BASEPATH%\cscl-change-detective\geodatabase-scripts\logs\%ENV%
 set NOTIFY=xxx@xxx.xxx.xxx

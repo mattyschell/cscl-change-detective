@@ -12,9 +12,11 @@ We will compare CSCL data to upstream or downstream sources. When one source cha
 
 ## Investigate
 
-The output of any investigation will be raw intelligence dossiers in the evidence folder. The dossiers will be named like "borough" and "borough-suspect". 
+The investigation will output raw intelligence dossiers in the evidence folder. The dossiers will be named like "borough" and "borough-suspect". 
 
-The output log will summarize these dirty dossiers. The log will unsurprisingly be in the log folder and named like investigate-Borough-20251027-151645.log 
+The investigation will summarize these dirty dossiers in an output log. The log unsurprisingly will be in the log folder and named like investigate-Borough-20251027-151645.log 
+
+The investigators are trained to investigate business key columns (ex borocode), text columns (ex boroname), and derived shape attributes (ex area, centroid).  Comparing centroids across storage types and environments is a proven strategy.  
 
 ### Compare a CSCL Featureclass to an ArcGIS Online Hosted Feature Layer
 
@@ -49,9 +51,9 @@ options:
   --externalwhereclause EXTERNALWHERECLAUSE
                         Where clause for external
   --shapecolumn SHAPECOLUMN
-                        Name of the approximating cscl shape column
+                        Name of the derived cscl shape column
   --externalshapecolumn EXTERNALSHAPECOLUMN
-                        Name of the approximating external shape column
+                        Name of the derived external shape column
   --rounddigits ROUNDDIGITS
                         Number of digits to round shape values
   --convertfactor CONVERTFACTOR
@@ -60,7 +62,7 @@ options:
 
 ### Compare a CSCL Featureclass to a PostGIS Table 
 
-See geodatabase-scripts/sample-postgis.bat
+See geodatabase-scripts/sample-postgis.bat  Same arguments as above.
 
 ```bat
 > set PGHOST=xyz

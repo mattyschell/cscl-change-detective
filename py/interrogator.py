@@ -56,8 +56,8 @@ class suspects:
                         if  shape_index is not None \
                         and convertfactor != 1:
                             row = self._convertrow(row
-                                                ,shape_index
-                                                ,convertfactor)
+                                                  ,shape_index
+                                                  ,convertfactor)
                         
                         if shape_index is not None:
                             row = self._roundrow(row
@@ -124,7 +124,7 @@ class suspects:
 
         if isinstance(row[rowindex], (tuple)): 
 
-            # for points we will typically request (x,y) instead of area/length
+            # for points or polygon centroids we will typically request (x,y) 
             # arcpy search cursor returns these as tuples
             # goes first, dont let it fall into the next elif
             # ToDo gotta think about PostGIS here
