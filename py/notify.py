@@ -52,7 +52,7 @@ def main():
             msg.set_content(content) 
         else:
             # we dont need the log, keep it simple
-            msg.set_content('PASS. We found no evidence that the external dataset differs from CSCL.') 
+            msg.set_content('PASS. We found no evidence.') 
     
     smtp = smtplib.SMTP(psmtpfrom)  
     msg['From'] = pemailfrom

@@ -71,6 +71,32 @@ See geodatabase-scripts/sample-postgis.bat  Same arguments as above.
 > geodatabase-scripts\sample-postgis.bat
 ```
 
+
+## The Sentinel
+
+The sentinel reports on all datasets that have changed in CSCL. It writes a timestamped log file under `evidenceroom\dev|stg|prd`.
+
+We use the last modified date in versioned views, where available, for this simple check. We should be aware that some of the datasets reported may be false positives. When underlying elements of the topology get updated the geometries in the hierarchy can recalculate without any actual change to the shape or attributes.
+
+Output file naming convention:
+
+```text
+sentinel-YYYYMMDD-HHMMSS.log
+```
+
+Run with Python:
+
+```bat
+python.exe .\py\sentinel.py dev --dbuser xxx --dbpassword xxxxx --dbname xxxx --owner xxxx --within month
+```
+
+See `geodatabase-scripts/sample-sentinel.bat` for an example.
+
+Runtime requirement:
+
+1. SQL*Plus must be installed and available on PATH.
+
+
 ## Tests
 
 ArcGIS Online and PostGIS tests. Update the environmental with your local PostgreSQL superuser for testing.
